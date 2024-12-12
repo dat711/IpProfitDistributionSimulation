@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import com.LegalEntitiesManagement.v1.Common.proxies.TransactionNode;
+import com.LegalEntitiesManagement.v1.Common.Proxies.TransactionNode;
 import java.util.HashSet;
 import java.util.Set;
 

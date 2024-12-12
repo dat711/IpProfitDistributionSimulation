@@ -1,4 +1,4 @@
-package com.LegalEntitiesManagement.v1.Common.proxies;
+package com.LegalEntitiesManagement.v1.Common.Proxies;
 
 import java.util.List;
 

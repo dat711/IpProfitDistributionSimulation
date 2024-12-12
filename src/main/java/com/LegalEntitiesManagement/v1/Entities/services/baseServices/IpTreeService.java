@@ -1,5 +1,5 @@
 package com.LegalEntitiesManagement.v1.Entities.services.baseServices;
-import com.LegalEntitiesManagement.v1.Common.proxies.BaseService;
+import com.LegalEntitiesManagement.v1.Common.Proxies.BaseService;
 import com.LegalEntitiesManagement.v1.Entities.dto.IpTreeDto;
 import com.LegalEntitiesManagement.v1.Entities.dto.mapper.IpTreeMapper;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.IpTreeNotFoundException;

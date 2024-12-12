@@ -2,11 +2,11 @@ package com.LegalEntitiesManagement.v1.Entities.services.baseServices;
 import com.LegalEntitiesManagement.v1.Entities.dto.IntellectualPropertyDto;
 import com.LegalEntitiesManagement.v1.Entities.dto.mapper.IntellectualPropertyMapper;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.IpNotFoundException;
-import com.LegalEntitiesManagement.v1.Common.proxies.Updatable;
+import com.LegalEntitiesManagement.v1.Common.Proxies.Updatable;
 import com.LegalEntitiesManagement.v1.Entities.model.IntellectualProperty;
 import com.LegalEntitiesManagement.v1.Entities.repositories.IntellectualPropertyRepository;
 import com.LegalEntitiesManagement.v1.Entities.services.UtilService;
-import com.LegalEntitiesManagement.v1.Common.proxies.BaseService;
+import com.LegalEntitiesManagement.v1.Common.Proxies.BaseService;
 
 import java.util.List;
 

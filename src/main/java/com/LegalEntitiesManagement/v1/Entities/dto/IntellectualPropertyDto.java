@@ -1,6 +1,5 @@
 package com.LegalEntitiesManagement.v1.Entities.dto;
 
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

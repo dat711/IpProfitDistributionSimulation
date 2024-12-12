@@ -4,14 +4,13 @@ import com.LegalEntitiesManagement.v1.Entities.exceptions.StakeHolderNotFoundExc
 import com.LegalEntitiesManagement.v1.Entities.model.Role;
 import com.LegalEntitiesManagement.v1.Entities.model.StakeHolder;
 import com.LegalEntitiesManagement.v1.Entities.repositories.StakeHolderRepository;
-import com.LegalEntitiesManagement.v1.Common.proxies.BaseService;
-import com.LegalEntitiesManagement.v1.Common.proxies.Updatable;
+import com.LegalEntitiesManagement.v1.Common.Proxies.BaseService;
+import com.LegalEntitiesManagement.v1.Common.Proxies.Updatable;
 import com.LegalEntitiesManagement.v1.Entities.dto.mapper.StakeHolderMapper;
 import com.LegalEntitiesManagement.v1.Entities.dto.StakeHolderDto;
 import com.LegalEntitiesManagement.v1.Entities.services.UtilService;
 
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 

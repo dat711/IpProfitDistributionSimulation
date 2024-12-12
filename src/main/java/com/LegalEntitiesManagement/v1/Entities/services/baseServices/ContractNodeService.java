@@ -1,6 +1,6 @@
 package com.LegalEntitiesManagement.v1.Entities.services.baseServices;
 
-import com.LegalEntitiesManagement.v1.Common.proxies.BaseService;
+import com.LegalEntitiesManagement.v1.Common.Proxies.BaseService;
 import com.LegalEntitiesManagement.v1.Entities.dto.ContractNodeDto;
 import com.LegalEntitiesManagement.v1.Entities.dto.mapper.ContractNodeMapper;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.ContractNodeNotFoundException;

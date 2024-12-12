@@ -1,6 +1,6 @@
 package com.LegalEntitiesManagement.v1.Entities.services.baseServices;
 
-import com.LegalEntitiesManagement.v1.Common.proxies.BaseService;
+import com.LegalEntitiesManagement.v1.Common.Proxies.BaseService;
 import com.LegalEntitiesManagement.v1.Entities.dto.ResponsibilityDto;
 import com.LegalEntitiesManagement.v1.Entities.dto.mapper.ResponsibilityMapper;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.ResponsibilityNotFoundException;

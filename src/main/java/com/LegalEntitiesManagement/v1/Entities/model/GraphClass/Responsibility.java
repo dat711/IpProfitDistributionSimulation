@@ -1,6 +1,6 @@
 package com.LegalEntitiesManagement.v1.Entities.model.GraphClass;
 
-import com.LegalEntitiesManagement.v1.Common.proxies.Edge;
+import com.LegalEntitiesManagement.v1.Common.Proxies.Edge;
 import lombok.AllArgsConstructor;
 
 import jakarta.persistence.*;

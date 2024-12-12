@@ -1,6 +1,6 @@
 package com.LegalEntitiesManagement.v1.Entities.services.baseServices;
-import com.LegalEntitiesManagement.v1.Common.proxies.BaseService;
-import com.LegalEntitiesManagement.v1.Common.proxies.Updatable;
+import com.LegalEntitiesManagement.v1.Common.Proxies.BaseService;
+import com.LegalEntitiesManagement.v1.Common.Proxies.Updatable;
 import com.LegalEntitiesManagement.v1.Entities.dto.IpBasedContractDto;
 import com.LegalEntitiesManagement.v1.Entities.dto.mapper.IpBasedContractMapper;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.ContractNotFoundException;

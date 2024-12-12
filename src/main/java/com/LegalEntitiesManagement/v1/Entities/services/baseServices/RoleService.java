@@ -5,11 +5,11 @@ import com.LegalEntitiesManagement.v1.Entities.dto.RoleDto;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.RoleNotFoundException;
 import com.LegalEntitiesManagement.v1.Entities.model.Role;
 import com.LegalEntitiesManagement.v1.Entities.repositories.RoleRepository;
-import com.LegalEntitiesManagement.v1.Common.proxies.Updatable;
+import com.LegalEntitiesManagement.v1.Common.Proxies.Updatable;
 
 import java.util.List;
 import com.LegalEntitiesManagement.v1.Entities.services.UtilService;
-import com.LegalEntitiesManagement.v1.Common.proxies.BaseService;
+import com.LegalEntitiesManagement.v1.Common.Proxies.BaseService;
 
 public class RoleService implements BaseService<Role, RoleDto, Long>, Updatable<Role, RoleDto> {
     private final RoleRepository roleRepository;

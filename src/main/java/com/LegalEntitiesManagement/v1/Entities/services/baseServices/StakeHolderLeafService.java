@@ -1,6 +1,6 @@
 package com.LegalEntitiesManagement.v1.Entities.services.baseServices;
 
-import com.LegalEntitiesManagement.v1.Common.proxies.BaseService;
+import com.LegalEntitiesManagement.v1.Common.Proxies.BaseService;
 import com.LegalEntitiesManagement.v1.Entities.dto.StakeHolderLeafDto;
 import com.LegalEntitiesManagement.v1.Entities.dto.mapper.StakeHolderLeafMapper;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.StakeHolderLeafNotFoundException;
