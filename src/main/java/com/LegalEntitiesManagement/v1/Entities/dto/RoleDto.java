@@ -1,5 +1,6 @@
 package com.LegalEntitiesManagement.v1.Entities.dto;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -21,7 +22,7 @@ public class RoleDto {
     @NotBlank(message = "The description of the role should not be blank")
     private String description;
 
-    @NotBlank(message = "The priority should be provided ")
+    @Min(value = 0, message = "The priority should be provided ")
     private int priority;
 
     public RoleDto(String name, String description, int priority) {

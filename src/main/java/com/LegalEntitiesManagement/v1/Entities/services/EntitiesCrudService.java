@@ -41,22 +41,20 @@ public class EntitiesCrudService {
         this.stakeHolderLeafService = stakeHolderLeafService;
     }
 
+
+    @Transactional
     public RoleDto addRole(RoleDto roleDto){
         Role savedRole = this.roleService.saveFromDto(roleDto);
         return roleMapper.toDto(savedRole);
     }
 
-    public RoleDto updateRole(RoleDto roleDto){
-        this.roleService.verify(roleDto);
-        Role updatedRole = this.roleService.saveFromDto(roleDto);
-        return roleMapper.toDto(updatedRole);
-    }
-
+    @Transactional
     public RoleDto getRole(Long id) {
         Role queriedRole = this.roleService.findById(id);
         return roleMapper.toDto(queriedRole);
     }
 
+    @Transactional
     public List<RoleDto> getAllRoles() {
         List<Role> roles = this.roleService.findAll();
         return roleMapper.toDtoList(roles);

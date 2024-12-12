@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 
-public class ExceptionHandlerAspect {
+public class ErrorsHandlerAspect {
     private ResponseEntity<ProblemDetail> notFoundProblemDetail(RuntimeException e){
         boolean notFound = e.getMessage().contains("Cannot find");
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
@@ -19,7 +19,7 @@ public class ExceptionHandlerAspect {
                 : ResponseEntity.status(HttpStatus.BAD_REQUEST).headers(ResponseHeadersHelper.getBaseHeaders()).body(problemDetail);
     }
 
-    @Around("@annotation(com.LegalEntitiesManagement.v1.Common.aspects.annotations.ExceptionHandler)")
+    @Around("@annotation(com.LegalEntitiesManagement.v1.Common.aspects.annotations.AspectErrorsHandler)")
     public Object HandleException(ProceedingJoinPoint joinPoint) throws Throwable {
         try {
             return joinPoint.proceed();
