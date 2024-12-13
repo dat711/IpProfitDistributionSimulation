@@ -37,6 +37,7 @@ public class RoleController {
     @GetMapping("/{id}")
     @AspectErrorsHandler
     public ResponseEntity<Object> getRole(@PathVariable long id){
+        System.out.println(id);
         RoleDto role = entitiesCrudService.getRole(id);
         return ResponseEntity.ok(role);
     }

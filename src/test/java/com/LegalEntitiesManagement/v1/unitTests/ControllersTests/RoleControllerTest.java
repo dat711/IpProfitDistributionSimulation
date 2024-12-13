@@ -2,15 +2,12 @@ package com.LegalEntitiesManagement.v1.unitTests.ControllersTests;
 
 import com.LegalEntitiesManagement.v1.Entities.controllers.RoleController;
 import com.LegalEntitiesManagement.v1.Entities.services.EntitiesCrudService;
-import com.LegalEntitiesManagement.v1.V1Application;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -26,8 +23,7 @@ import com.LegalEntitiesManagement.v1.Entities.dto.RoleDto;
 import org.junit.jupiter.api.BeforeEach;
 
 @WebMvcTest(RoleController.class)
-@ContextConfiguration(classes = V1Application.class)
-public class RoleControllerTest {
+public class RoleControllerTest extends BaseControllerTestClass{
     @Autowired
     private MockMvc mockMvc;
 
@@ -64,5 +60,33 @@ public class RoleControllerTest {
                 .andExpect(jsonPath("$.data.description").value("Administrator role"))
                 .andExpect(jsonPath("$.data.priority").value(1))
                 .andExpect(jsonPath("$.message").value("Role saved successfully"));
+    }
+
+    @Test
+    void createRole_InvalidInput_ReturnsBadRequest() throws Exception {
+        RoleDto invalidRole = new RoleDto();
+        invalidRole.setName(""); // Invalid empty name
+
+        mockMvc.perform(post("/api/v1/roles")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRole)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.type").value("https://errors.example.com/invalid-input"))
+                .andExpect(jsonPath("$.title").value("Validation errors in your request"))
+                .andExpect(jsonPath("$.Errors").isArray());
+    }
+
+    @Test
+    void createRole_InvalidPriority_ReturnsBadRequest() throws Exception {
+        RoleDto invalidRole = new RoleDto();
+        invalidRole.setName("Test Role");
+        invalidRole.setDescription("Test Description");
+        invalidRole.setPriority(-1); // Invalid priority
+
+        mockMvc.perform(post("/api/v1/roles")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRole)))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 }
