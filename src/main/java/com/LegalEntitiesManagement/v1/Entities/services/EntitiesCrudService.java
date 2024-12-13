@@ -121,4 +121,8 @@ public class EntitiesCrudService {
     public boolean intellectualPropertyExists(Long id) {
         return intellectualPropertyService.existsById(id);
     }
+
+    public void deleteStakeHolder(Long id){
+        this.stakeHolderService.deleteById(id);
+    }
 }

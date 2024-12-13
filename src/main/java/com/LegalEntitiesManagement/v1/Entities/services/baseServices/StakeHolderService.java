@@ -50,7 +50,9 @@ public class StakeHolderService implements BaseService<StakeHolder, StakeHolderD
     }
 
     @Override
-    public void deleteById(Long id) {}
+    public void deleteById(Long id) {
+        this.stakeHolderRepository.deleteById(id);
+    }
 
     @Override
     public List<StakeHolder> findAll() {

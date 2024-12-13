@@ -2,6 +2,7 @@ package com.LegalEntitiesManagement.v1.Entities.controllers;
 
 import com.LegalEntitiesManagement.v1.Common.aspects.annotations.CheckRequestBody;
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.ResponseHeadersHelper;
+import com.LegalEntitiesManagement.v1.Common.aspects.helpers.SpecialResponseBody;
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.SuccessResponse;
 import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ExistsConstraint;
 import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.InsertRoleDto;
@@ -13,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import com.LegalEntitiesManagement.v1.Common.aspects.annotations.AspectErrorsHandler;
+
+import java.util.HashSet;
 import java.util.List;
 
 @RestController
@@ -40,12 +43,16 @@ public class RoleController {
     public ResponseEntity<Object> getRole(@ExistsConstraint(entity = "role") @PathVariable long id){
         System.out.println(id);
         RoleDto role = entitiesCrudService.getRole(id);
-        return ResponseEntity.ok(role);
+        return ResponseEntity.status(HttpStatus.OK).headers(ResponseHeadersHelper.getBaseHeaders()).body(
+                SpecialResponseBody.addLink(RoleDto.class , role, "/api/v1/roles")
+        );
     }
 
     @GetMapping
-    public ResponseEntity<List<RoleDto>> getAllRoles(){
+    public ResponseEntity<Object> getAllRoles(){
         List<RoleDto> roles = entitiesCrudService.getAllRoles();
-        return ResponseEntity.status(HttpStatus.OK).headers(ResponseHeadersHelper.getBaseHeaders()).body(roles);
+        return ResponseEntity.status(HttpStatus.OK).headers(ResponseHeadersHelper.getBaseHeaders()).body(
+                SpecialResponseBody.addLinks(RoleDto.class , new HashSet<>(roles), "/api/v1/roles")
+        );
     }
 }
