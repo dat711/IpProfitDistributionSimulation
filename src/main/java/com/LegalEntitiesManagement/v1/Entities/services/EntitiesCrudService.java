@@ -109,4 +109,16 @@ public class EntitiesCrudService {
         List<StakeHolder> stakeHolders = this.stakeHolderService.findAll();
         return stakeHolderMapper.toDtoList(stakeHolders);
     }
+
+    public boolean roleExists(Long id) {
+        return roleService.existsById(id);
+    }
+
+    public boolean stakeholderExists(Long id) {
+        return stakeHolderService.existsById(id);
+    }
+
+    public boolean intellectualPropertyExists(Long id) {
+        return intellectualPropertyService.existsById(id);
+    }
 }

@@ -3,6 +3,7 @@ package com.LegalEntitiesManagement.v1.Entities.controllers;
 import com.LegalEntitiesManagement.v1.Common.aspects.annotations.CheckRequestBody;
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.ResponseHeadersHelper;
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.SuccessResponse;
+import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ExistsConstraint;
 import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.InsertRoleDto;
 import com.LegalEntitiesManagement.v1.Entities.dto.RoleDto;
 import com.LegalEntitiesManagement.v1.Entities.services.EntitiesCrudService;
@@ -36,7 +37,7 @@ public class RoleController {
 
     @GetMapping("/{id}")
     @AspectErrorsHandler
-    public ResponseEntity<Object> getRole(@PathVariable long id){
+    public ResponseEntity<Object> getRole(@ExistsConstraint(entity = "role") @PathVariable long id){
         System.out.println(id);
         RoleDto role = entitiesCrudService.getRole(id);
         return ResponseEntity.ok(role);
