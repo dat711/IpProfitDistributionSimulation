@@ -5,6 +5,7 @@ import com.LegalEntitiesManagement.v1.Common.aspects.helpers.ResponseHeadersHelp
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.SpecialResponseBody;
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.SuccessResponse;
 import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ExistsConstraint;
+import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ValidStakeHolderDelete;
 import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ValidStakeHolderUpdate;
 import com.LegalEntitiesManagement.v1.Entities.dto.StakeHolderDto;
 import com.LegalEntitiesManagement.v1.Entities.services.EntitiesCrudService;
@@ -82,7 +83,8 @@ public class StakeHolderController {
     @DeleteMapping("/{id}")
     @AspectErrorsHandler
     @CheckRequestBody
-    public ResponseEntity<Object> deleteStakeHolder(@ExistsConstraint(entity = "stakeholder") @PathVariable long id){
+    public ResponseEntity<Object> deleteStakeHolder(@ExistsConstraint(entity = "stakeholder") @ValidStakeHolderDelete
+                                                        @PathVariable long id){
         this.entitiesCrudService.deleteStakeHolder(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(SpecialResponseBody.deleteObject("StakeHolder", id));

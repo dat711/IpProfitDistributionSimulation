@@ -84,4 +84,9 @@ public class BaseContractParticipantService implements BaseService<ContractParti
         return participantRepository.findExecutorByContractId(contractId).orElseThrow(() ->
                 new RuntimeException(String.format("The Contract with id %s do not have an executor", contractId)));
     }
+
+    // In BaseContractParticipantService.java
+    public Set<ContractParticipant> findByStakeholderId(Long stakeholderId) {
+        return participantRepository.findByStakeholderId(stakeholderId);
+    }
 }

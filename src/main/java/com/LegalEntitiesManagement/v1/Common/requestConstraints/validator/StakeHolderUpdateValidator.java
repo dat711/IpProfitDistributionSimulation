@@ -43,7 +43,7 @@ public class StakeHolderUpdateValidator implements ConstraintValidator<ValidStak
 
         // Validate roleId hasn't changed
         if (!originalDto.getRoleId().equals(updateDto.getRoleId())) {
-            context.buildConstraintViolationWithTemplate("Role ID cannot be modified")
+            context.buildConstraintViolationWithTemplate("Role ID cannot be modified, if you need the identical stakeholder with the new Role, create a new one, or delete this one and recreate")
                     .addPropertyNode("roleId")
                     .addConstraintViolation();
             isValid = false ;

@@ -3,13 +3,11 @@ package com.LegalEntitiesManagement.v1.Entities.services;
 import com.LegalEntitiesManagement.v1.Entities.dto.IntellectualPropertyDto;
 import com.LegalEntitiesManagement.v1.Entities.dto.RoleDto;
 import com.LegalEntitiesManagement.v1.Entities.dto.StakeHolderDto;
+import com.LegalEntitiesManagement.v1.Entities.model.ContractParticipant;
 import com.LegalEntitiesManagement.v1.Entities.model.GraphClass.StakeHolderLeaf;
 import com.LegalEntitiesManagement.v1.Entities.model.Role;
 import com.LegalEntitiesManagement.v1.Entities.model.StakeHolder;
-import com.LegalEntitiesManagement.v1.Entities.services.baseServices.IntellectualPropertyService;
-import com.LegalEntitiesManagement.v1.Entities.services.baseServices.RoleService;
-import com.LegalEntitiesManagement.v1.Entities.services.baseServices.StakeHolderLeafService;
-import com.LegalEntitiesManagement.v1.Entities.services.baseServices.StakeHolderService;
+import com.LegalEntitiesManagement.v1.Entities.services.baseServices.*;
 import org.springframework.stereotype.Service;
 import com.LegalEntitiesManagement.v1.Entities.model.IntellectualProperty;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +16,7 @@ import com.LegalEntitiesManagement.v1.Entities.dto.mapper.StakeHolderMapper;
 import com.LegalEntitiesManagement.v1.Entities.dto.mapper.IntellectualPropertyMapper;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -25,6 +24,8 @@ public class EntitiesCrudService {
     private final IntellectualPropertyService intellectualPropertyService;
     private final StakeHolderService stakeHolderService;
     private final RoleService roleService;
+
+    private final BaseContractParticipantService baseContractParticipantService;
 
     private final StakeHolderLeafService stakeHolderLeafService;
 
@@ -34,10 +35,11 @@ public class EntitiesCrudService {
 
     private final IntellectualPropertyMapper intellectualPropertyMapper = IntellectualPropertyMapper.INSTANCE;
 
-    public EntitiesCrudService(IntellectualPropertyService intellectualPropertyService, StakeHolderService stakeHolderService, RoleService roleService, StakeHolderLeafService stakeHolderLeafService) {
+    public EntitiesCrudService(IntellectualPropertyService intellectualPropertyService, StakeHolderService stakeHolderService, RoleService roleService, BaseContractParticipantService baseContractParticipantService, StakeHolderLeafService stakeHolderLeafService) {
         this.intellectualPropertyService = intellectualPropertyService;
         this.stakeHolderService = stakeHolderService;
         this.roleService = roleService;
+        this.baseContractParticipantService = baseContractParticipantService;
         this.stakeHolderLeafService = stakeHolderLeafService;
     }
 
@@ -124,5 +126,9 @@ public class EntitiesCrudService {
 
     public void deleteStakeHolder(Long id){
         this.stakeHolderService.deleteById(id);
+    }
+
+    public Set<ContractParticipant> findParticipantsByStakeHolderId(Long id){
+        return this.baseContractParticipantService.findByStakeholderId(id);
     }
 }

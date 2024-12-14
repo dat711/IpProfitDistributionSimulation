@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -215,5 +216,51 @@ public class ContractParticipantRepositoryTest extends BaseRepositoryTestPropert
                 .anyMatch(p -> p.getStakeholder().getId().equals(testExecutor.getId())));
         assertTrue(allParticipants.stream()
                 .anyMatch(p -> p.getStakeholder().getId().equals(testParticipant.getId())));
+    }
+
+    @Test
+    @Order(8)
+    void testFindByStakeholderId() {
+        // Create and save multiple contracts and participants to test comprehensive retrieval
+        Contract testContract2 = new Contract(
+                "Test Contract 2",
+                LocalDate.now(),
+                2,
+                testExecutor
+        );
+        testContract2 = contractRepository.save(testContract2);
+
+        // Create participants in first contract
+        ContractParticipant participant1 = new ContractParticipant(
+                testContract,
+                40.0,
+                false,
+                testParticipant
+        );
+        ContractParticipant participant2 = new ContractParticipant(
+                testContract2,
+                30.0,
+                false,
+                testParticipant
+        );
+
+        // Save participants
+        contractParticipantRepository.save(participant1);
+        contractParticipantRepository.save(participant2);
+
+        // Test finding by stakeholder ID
+        Set<ContractParticipant> foundParticipants = contractParticipantRepository
+                .findByStakeholderId(testParticipant.getId());
+
+        // Verify results
+        assertNotNull(foundParticipants);
+        assertEquals(2, foundParticipants.size());
+        assertTrue(foundParticipants.stream()
+                .allMatch(p -> p.getStakeholder().getId().equals(testParticipant.getId())));
+        assertTrue(foundParticipants.stream()
+                .map(ContractParticipant::getContract)
+                .map(Contract::getId)
+                .collect(Collectors.toSet())
+                .containsAll(Set.of(testContract.getId(), testContract2.getId())));
     }
 }

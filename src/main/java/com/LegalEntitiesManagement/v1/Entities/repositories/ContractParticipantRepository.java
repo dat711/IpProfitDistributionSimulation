@@ -24,5 +24,9 @@ public interface ContractParticipantRepository extends JpaRepository<ContractPar
             @Param("stakeholderId") Long stakeholderId
     );
 
+    // In ContractParticipantRepository.java
+    @Query("SELECT cp FROM ContractParticipant cp WHERE cp.stakeholder.id = :stakeholderId")
+    Set<ContractParticipant> findByStakeholderId(@Param("stakeholderId") Long stakeholderId);
+
 
 }
