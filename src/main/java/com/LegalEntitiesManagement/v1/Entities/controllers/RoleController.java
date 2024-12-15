@@ -30,13 +30,6 @@ public class RoleController {
     @AspectErrorsHandler
     @CheckRequestBody
     public ResponseEntity<Object> createRole(@Valid @InsertRoleDto @RequestBody RoleDto roleDto, BindingResult bindingResult) {
-        bindingResult.getFieldErrors().forEach(
-                fieldError -> {
-                    System.out.println("Error is: " + fieldError.getField());
-                    System.out.println("Error message is: " + fieldError.getDefaultMessage());
-                    System.out.println("-------------------------------------------");
-                }
-        );
         RoleDto savedRole = entitiesCrudService.addRole(roleDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .headers(ResponseHeadersHelper.getSuccessPostHeaders(String.format("/api/v1/roles/%s", savedRole.getId())))
