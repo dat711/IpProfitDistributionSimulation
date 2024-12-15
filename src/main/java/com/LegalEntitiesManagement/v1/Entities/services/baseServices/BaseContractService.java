@@ -47,7 +47,7 @@ public class BaseContractService implements BaseService<Contract, ContractDto, L
 
     @Override
     public void deleteById(Long id) {
-        // Not implemented as per requirements
+        this.contractRepository.deleteById(id);
     }
 
     @Override

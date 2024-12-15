@@ -4,7 +4,6 @@ import com.LegalEntitiesManagement.v1.Common.aspects.annotations.CheckRequestBod
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.ResponseHeadersHelper;
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.SpecialResponseBody;
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.SuccessResponse;
-import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ExistsConstraint;
 import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ValidUpdate;
 import com.LegalEntitiesManagement.v1.Entities.dto.StakeHolderDto;
 import com.LegalEntitiesManagement.v1.Entities.services.EntitiesCrudService;
@@ -64,8 +63,7 @@ public class StakeHolderController {
     @AspectErrorsHandler
     @CheckRequestBody
     @ValidUpdate(entity = "stakeholder")
-    public ResponseEntity<Object> updateStakeHolder(
-            @ExistsConstraint(entity = "stakeholder") @PathVariable long id,
+    public ResponseEntity<Object> updateStakeHolder( @PathVariable long id,
             @Valid @RequestBody StakeHolderDto stakeHolderDto,
             BindingResult bindingResult) {
         stakeHolderDto.setId(id);

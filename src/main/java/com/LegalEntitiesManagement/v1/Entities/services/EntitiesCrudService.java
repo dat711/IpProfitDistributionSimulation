@@ -3,6 +3,7 @@ package com.LegalEntitiesManagement.v1.Entities.services;
 import com.LegalEntitiesManagement.v1.Entities.dto.IntellectualPropertyDto;
 import com.LegalEntitiesManagement.v1.Entities.dto.RoleDto;
 import com.LegalEntitiesManagement.v1.Entities.dto.StakeHolderDto;
+import com.LegalEntitiesManagement.v1.Entities.exceptions.IpNotFoundException;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.RoleNotFoundException;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.StakeHolderNotFoundException;
 import com.LegalEntitiesManagement.v1.Entities.model.ContractParticipant;
@@ -31,40 +32,44 @@ public class EntitiesCrudService {
 
     private final StakeHolderLeafService stakeHolderLeafService;
 
+    private final BaseContractService contractService;
+
+    private final GraphBuilderService graphBuilderService;
+
+    private final IpBasedContractService ipBasedContractService;
+
     private final RoleMapper roleMapper = RoleMapper.INSTANCE;
 
     private final StakeHolderMapper stakeHolderMapper = StakeHolderMapper.INSTANCE;
 
     private final IntellectualPropertyMapper intellectualPropertyMapper = IntellectualPropertyMapper.INSTANCE;
 
-    public EntitiesCrudService(IntellectualPropertyService intellectualPropertyService, StakeHolderService stakeHolderService, RoleService roleService, BaseContractParticipantService baseContractParticipantService, StakeHolderLeafService stakeHolderLeafService) {
+    public EntitiesCrudService(IntellectualPropertyService intellectualPropertyService, StakeHolderService stakeHolderService, RoleService roleService, BaseContractParticipantService baseContractParticipantService, StakeHolderLeafService stakeHolderLeafService, BaseContractService contractService, GraphBuilderService graphBuilderService, IpBasedContractService ipBasedContractService) {
         this.intellectualPropertyService = intellectualPropertyService;
         this.stakeHolderService = stakeHolderService;
         this.roleService = roleService;
         this.baseContractParticipantService = baseContractParticipantService;
         this.stakeHolderLeafService = stakeHolderLeafService;
+        this.contractService = contractService;
+        this.graphBuilderService = graphBuilderService;
+        this.ipBasedContractService = ipBasedContractService;
     }
 
-
-    @Transactional
     public RoleDto addRole(RoleDto roleDto){
         Role savedRole = this.roleService.saveFromDto(roleDto);
         return roleMapper.toDto(savedRole);
     }
 
-    @Transactional
     public RoleDto getRole(Long id) {
         Role queriedRole = this.roleService.findById(id);
         return roleMapper.toDto(queriedRole);
     }
 
-    @Transactional
     public List<RoleDto> getAllRoles() {
         List<Role> roles = this.roleService.findAll();
         return roleMapper.toDtoList(roles);
     }
 
-    @Transactional
     public RoleDto updateRole(RoleDto roleDto){
         Role updatedRole = this.roleService.updateFromDto(roleDto);
         return roleMapper.toDto(updatedRole);
@@ -154,6 +159,14 @@ public class EntitiesCrudService {
     }
 
     public void deleteIntellectualProperty(Long id){
+        if(!this.intellectualPropertyService.existsById(id)){
+            throw new IpNotFoundException(id);
+        }
+
+        if (this.ipBasedContractService.existByIpId(id)){
+            throw new IllegalArgumentException("Exist contract associate with this Ip");
+        }
+
         this.intellectualPropertyService.deleteById(id);
     }
 

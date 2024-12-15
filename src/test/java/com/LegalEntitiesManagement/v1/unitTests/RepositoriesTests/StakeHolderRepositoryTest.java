@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 public class StakeHolderRepositoryTest extends BaseRepositoryTestProperties  {
     @Autowired
@@ -138,5 +140,43 @@ public class StakeHolderRepositoryTest extends BaseRepositoryTestProperties  {
         assertEquals(testRole.getName(), retrievedStakeHolder.getRole().getName());
         assertEquals(testRole.getDescription(), retrievedStakeHolder.getRole().getDescription());
         assertEquals(testRole.getPriority(), retrievedStakeHolder.getRole().getPriority());
+    }
+
+    @Test
+    @Order(8)
+    void testFindByRoleId() {
+        // Create and save multiple stakeholders with the same role
+        StakeHolder stakeholder1 = new StakeHolder("StakeHolder 1", testRole);
+        StakeHolder stakeholder2 = new StakeHolder("StakeHolder 2", testRole);
+        StakeHolder stakeholder3 = new StakeHolder("StakeHolder 3", testRole);
+
+        stakeHolderRepository.save(stakeholder1);
+        stakeHolderRepository.save(stakeholder2);
+        stakeHolderRepository.save(stakeholder3);
+
+        // Create another role and stakeholder
+        Role anotherRole = new Role("Another Role", "Another Role Description", 2);
+        anotherRole = roleRepository.save(anotherRole);
+
+        StakeHolder stakeholder4 = new StakeHolder("StakeHolder 4", anotherRole);
+        stakeHolderRepository.save(stakeholder4);
+
+        // Test findByRoleId for testRole
+        List<StakeHolder> stakeholdersForTestRole = stakeHolderRepository.findByRoleId(testRole.getId());
+        assertEquals(3, stakeholdersForTestRole.size());
+        assertTrue(stakeholdersForTestRole.stream().allMatch(sh -> sh.getRole().getId().equals(testRole.getId())));
+        assertTrue(stakeholdersForTestRole.stream()
+                .map(StakeHolder::getName)
+                .allMatch(name -> name.startsWith("StakeHolder")));
+
+        // Test findByRoleId for anotherRole
+        List<StakeHolder> stakeholdersForAnotherRole = stakeHolderRepository.findByRoleId(anotherRole.getId());
+        assertEquals(1, stakeholdersForAnotherRole.size());
+        assertEquals("StakeHolder 4", stakeholdersForAnotherRole.get(0).getName());
+        assertEquals(anotherRole.getId(), stakeholdersForAnotherRole.get(0).getRole().getId());
+
+        // Test findByRoleId for non-existent role
+        List<StakeHolder> stakeholdersForNonExistentRole = stakeHolderRepository.findByRoleId(999L);
+        assertTrue(stakeholdersForNonExistentRole.isEmpty());
     }
 }

@@ -11,7 +11,6 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration(classes = V1Application.class)
 @Import({DtoConstraintsHandlerAspect.class,
         ErrorsHandlerAspect.class,
-        ExistsValidator.class,
         DtoInsertChecking.class,
         TotalBenefitValidator.class,
         UpdateValidator.class

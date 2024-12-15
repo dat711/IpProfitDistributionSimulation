@@ -55,7 +55,7 @@ public class IpBasedContractService implements BaseService<IpBasedContract, IpBa
 
     @Override
     public void deleteById(Long id) {
-        // Not implemented as per requirements
+        this.ipBasedContractRepository.deleteById(id);
     }
 
     @Override

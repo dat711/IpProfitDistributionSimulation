@@ -50,6 +50,10 @@ public class UpdateValidator implements ConstraintValidator<ValidUpdate, Object[
         }
 
         if (!entitiesCrudService.roleExists(id)){
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate("Role do not exist")
+                    .addPropertyNode("Role")
+                    .addConstraintViolation();
             return false;
         }
 
@@ -75,6 +79,9 @@ public class UpdateValidator implements ConstraintValidator<ValidUpdate, Object[
         }
 
         if (!entitiesCrudService.stakeholderExists(id)){
+            context.buildConstraintViolationWithTemplate("StakeHolder do not exist")
+                    .addPropertyNode("StakeHolder")
+                    .addConstraintViolation();
             return false;
         }
 
