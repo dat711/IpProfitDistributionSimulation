@@ -3,6 +3,8 @@ package com.LegalEntitiesManagement.v1.Entities.services;
 import com.LegalEntitiesManagement.v1.Entities.dto.IntellectualPropertyDto;
 import com.LegalEntitiesManagement.v1.Entities.dto.RoleDto;
 import com.LegalEntitiesManagement.v1.Entities.dto.StakeHolderDto;
+import com.LegalEntitiesManagement.v1.Entities.exceptions.RoleNotFoundException;
+import com.LegalEntitiesManagement.v1.Entities.exceptions.StakeHolderNotFoundException;
 import com.LegalEntitiesManagement.v1.Entities.model.ContractParticipant;
 import com.LegalEntitiesManagement.v1.Entities.model.GraphClass.StakeHolderLeaf;
 import com.LegalEntitiesManagement.v1.Entities.model.Role;
@@ -129,11 +131,31 @@ public class EntitiesCrudService {
         return intellectualPropertyService.existsById(id);
     }
 
-    public void deleteStakeHolder(Long id){this.stakeHolderService.deleteById(id);}
+    public void deleteStakeHolder(Long id){
+        if (!this.stakeholderExists(id)){
+            throw new StakeHolderNotFoundException(id);
+        }
 
-    public void deleteRole(Long id){this.roleService.deleteById(id);}
+        if (!this.findParticipantsByStakeHolderId(id).isEmpty()){
+            throw new IllegalArgumentException("Exist StakeHolders depend on the attempted delete Role");
+        }
+        this.stakeHolderService.deleteById(id);
+    }
 
-    public void deleteIntellectualProperty(Long id){this.intellectualPropertyService.deleteById(id);}
+    public void deleteRole(Long id){
+        if (!this.roleExists(id)){
+            throw new RoleNotFoundException(id);
+        }
+
+        if (this.stakeHolderExistByRoleId(id)){
+            throw new IllegalArgumentException("Exist StakeHolders depend on the attempted delete Role");
+        }
+        this.roleService.deleteById(id);
+    }
+
+    public void deleteIntellectualProperty(Long id){
+        this.intellectualPropertyService.deleteById(id);
+    }
 
     public boolean stakeHolderExistByRoleId(Long id){
         return this.stakeHolderService.existByRoleId(id);

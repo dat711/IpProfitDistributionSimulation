@@ -8,10 +8,14 @@ import jakarta.validation.ConstraintValidatorContext;
 public class RoleDtoInsertValidator implements ConstraintValidator<InsertRoleDto, RoleDto> {
     @Override
     public boolean isValid(RoleDto request, ConstraintValidatorContext context ){
+        System.out.println("Do run");
+
         DtoInsertChecking.NullInsertErrorDetails nullInsertErrorDetails = DtoInsertChecking
                 .isInsertRequestValid(request.getClass(), request);
 
         boolean isValid = nullInsertErrorDetails.isValid();
+
+        System.out.println("Is valid is: " + isValid);
 
         if (!isValid){
             context.disableDefaultConstraintViolation();

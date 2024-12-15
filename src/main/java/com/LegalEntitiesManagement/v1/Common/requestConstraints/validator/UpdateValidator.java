@@ -6,11 +6,14 @@ import com.LegalEntitiesManagement.v1.Entities.dto.StakeHolderDto;
 import com.LegalEntitiesManagement.v1.Entities.services.EntitiesCrudService;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.constraintvalidation.SupportedValidationTarget;
+import jakarta.validation.constraintvalidation.ValidationTarget;
 
 /* To do:
 *  Refactor the code to method constraints validator aka cross parameter validator so that I can finish it. haha. so happy
 * */
 
+@SupportedValidationTarget(ValidationTarget.PARAMETERS)
 public class UpdateValidator implements ConstraintValidator<ValidUpdate, Object[]>{
     private final EntitiesCrudService entitiesCrudService;
 
@@ -28,6 +31,7 @@ public class UpdateValidator implements ConstraintValidator<ValidUpdate, Object[
     @Override
     public boolean isValid(Object[] parameter, ConstraintValidatorContext context) {
         Long id = (Long) parameter[0];
+        System.out.println("Still okay");
         if(entity.equals("stakeholder")){
             return canUpdateStakeHolder(id, (StakeHolderDto) parameter[1], context);
         }
@@ -40,6 +44,7 @@ public class UpdateValidator implements ConstraintValidator<ValidUpdate, Object[
     }
 
     private boolean canUpdateRole(Long id, RoleDto updateDto, ConstraintValidatorContext context){
+        System.out.println("Come here");
         if (updateDto == null) {
             return false;
         }

@@ -12,22 +12,19 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Aspect
 @Component
 public class DtoConstraintsHandlerAspect {
     @Around("@annotation(com.LegalEntitiesManagement.v1.Common.aspects.annotations.CheckRequestBody)")
     public Object handleValidationsResult(ProceedingJoinPoint joinPoint) throws Throwable {
-        System.out.println("This validation cases");
-
         Object[] args = joinPoint.getArgs();
         BindingResult bindingResult = (BindingResult) args[args.length - 1];
         if (!bindingResult.hasErrors()){
             return joinPoint.proceed();
         }
+
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problemDetail.setTitle("Validation errors in your request");
         problemDetail.setType(URI.create("https://errors.example.com/invalid-input"));

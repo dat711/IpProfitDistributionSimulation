@@ -22,11 +22,8 @@ public class SpecialResponseBody {
     public static Map<String, Object> addLink(Class<?> clazz, Object item, String linkTemplate){
         List<Field> fields = List.of(clazz.getDeclaredFields());
         Long id = fields.stream().peek(field -> field.setAccessible(true))
-                .peek(field -> System.out.println("Field name is: " + field.getName()))
                 .filter(field -> field.getName().equals("id"))
                 .mapToLong(field -> {
-                    System.out.println("Field name is " + field.getName());
-
                     try {
                         return (Long) field.get(item);
                     } catch (IllegalAccessException e) {
@@ -34,7 +31,7 @@ public class SpecialResponseBody {
                     }
                 }).findFirst().orElseThrow();
         fields.forEach(field -> field.setAccessible(false));
-        String link = String.format(linkTemplate, id);
+        String link = String.format( "%s/%s",linkTemplate, id);
         HashMap<String, Object> addedLink = new HashMap<>();
         addedLink.put("Link", link);
         addedLink.put("data", clazz.cast(item));

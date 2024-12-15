@@ -12,10 +12,8 @@ import org.springframework.test.context.ContextConfiguration;
 @Import({DtoConstraintsHandlerAspect.class,
         ErrorsHandlerAspect.class,
         ExistsValidator.class,
-        DeleteValidator.class,
         DtoInsertChecking.class,
         TotalBenefitValidator.class,
         UpdateValidator.class
 })
-@EnableAspectJAutoProxy
 public class BaseControllerTestClass { }

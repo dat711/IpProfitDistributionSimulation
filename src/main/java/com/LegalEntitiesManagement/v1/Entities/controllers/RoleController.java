@@ -3,9 +3,7 @@ package com.LegalEntitiesManagement.v1.Entities.controllers;
 import com.LegalEntitiesManagement.v1.Common.aspects.annotations.CheckRequestBody;
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.ResponseHeadersHelper;
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.SpecialResponseBody;
-import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ExistsConstraint;
 import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.InsertRoleDto;
-import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ValidDelete;
 import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ValidUpdate;
 import com.LegalEntitiesManagement.v1.Entities.dto.RoleDto;
 import com.LegalEntitiesManagement.v1.Entities.services.EntitiesCrudService;
@@ -32,16 +30,23 @@ public class RoleController {
     @AspectErrorsHandler
     @CheckRequestBody
     public ResponseEntity<Object> createRole(@Valid @InsertRoleDto @RequestBody RoleDto roleDto, BindingResult bindingResult) {
+        bindingResult.getFieldErrors().forEach(
+                fieldError -> {
+                    System.out.println("Error is: " + fieldError.getField());
+                    System.out.println("Error message is: " + fieldError.getDefaultMessage());
+                    System.out.println("-------------------------------------------");
+                }
+        );
         RoleDto savedRole = entitiesCrudService.addRole(roleDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .headers(ResponseHeadersHelper.getSuccessPostHeaders(String.format("/api/v1/roles/%s", savedRole.getId())))
                 .body(SpecialResponseBody.getSuccessResponses(RoleDto.class, savedRole, "/api/v1/roles",
-                        "Roles created successfully"));
+                        "Role created successfully"));
     }
 
     @GetMapping("/{id}")
     @AspectErrorsHandler
-    public ResponseEntity<Object> getRole(@ExistsConstraint(entity = "role") @PathVariable long id){
+    public ResponseEntity<Object> getRole(@PathVariable long id){
         RoleDto role = entitiesCrudService.getRole(id);
         return ResponseEntity.status(HttpStatus.OK).headers(ResponseHeadersHelper.getBaseHeaders()).body(
                 SpecialResponseBody.addLink(RoleDto.class , role, "/api/v1/roles")
@@ -56,24 +61,22 @@ public class RoleController {
         );
     }
 
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     @AspectErrorsHandler
     @CheckRequestBody
     @ValidUpdate(entity = "role")
-    public  ResponseEntity<Object> updateRole(@PathVariable long id,
-                                              @Valid @RequestBody RoleDto roleDto){
+    public ResponseEntity<Object> updateRole(@PathVariable long id,
+                                              @Valid @RequestBody RoleDto roleDto, BindingResult bindingResult){
         roleDto.setId(id);
         RoleDto updatedRole = this.entitiesCrudService.updateRole(roleDto);
         return ResponseEntity.status(HttpStatus.OK).headers(ResponseHeadersHelper.getSuccessGetPutHeaders())
                 .body(SpecialResponseBody.getSuccessResponses(RoleDto.class, updatedRole, "/api/v1/roles",
-                        "Roles updated successfully"));
+                        "Role updated successfully"));
     }
 
     @DeleteMapping("/{id}")
     @AspectErrorsHandler
-    @CheckRequestBody
-    public ResponseEntity<Object> deleteRole(@ExistsConstraint(entity = "role")
-                                                 @ValidDelete(entity = "role") @PathVariable long id){
+    public ResponseEntity<Object> deleteRole(@PathVariable long id){
         entitiesCrudService.deleteRole(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .headers(ResponseHeadersHelper.getBaseHeaders())

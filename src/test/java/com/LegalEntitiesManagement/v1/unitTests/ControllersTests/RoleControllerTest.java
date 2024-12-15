@@ -55,11 +55,11 @@ public class RoleControllerTest extends BaseControllerTestClass{
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/v1/roles/1"))
-                .andExpect(jsonPath("$.data.id").value(1))
-                .andExpect(jsonPath("$.data.name").value("Admin"))
-                .andExpect(jsonPath("$.data.description").value("Administrator role"))
-                .andExpect(jsonPath("$.data.priority").value(1))
-                .andExpect(jsonPath("$.message").value("Role saved successfully"));
+                .andExpect(jsonPath("$.data.data.id").value(1))
+                .andExpect(jsonPath("$.data.data.name").value("Admin"))
+                .andExpect(jsonPath("$.data.data.description").value("Administrator role"))
+                .andExpect(jsonPath("$.data.data.priority").value(1))
+                .andExpect(jsonPath("$.message").value("Role created successfully"));
     }
 
     @Test
@@ -70,6 +70,7 @@ public class RoleControllerTest extends BaseControllerTestClass{
         mockMvc.perform(post("/api/v1/roles")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRole)))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.type").value("https://errors.example.com/invalid-input"))
                 .andExpect(jsonPath("$.title").value("Validation errors in your request"))
