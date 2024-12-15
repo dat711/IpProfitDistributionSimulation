@@ -83,6 +83,10 @@ public class StakeHolderService implements BaseService<StakeHolder, StakeHolderD
         }
     }
 
+    public boolean existByRoleId(Long id){
+        return !this.stakeHolderRepository.findByRoleId(id).isEmpty();
+    }
+
     // In service layer
     public List<StakeHolder> findAndVerifyAll(Collection<Long> stakeholderIds) {
         List<StakeHolder> found = stakeHolderRepository.findAllById(stakeholderIds);

@@ -62,6 +62,12 @@ public class EntitiesCrudService {
         return roleMapper.toDtoList(roles);
     }
 
+    @Transactional
+    public RoleDto updateRole(RoleDto roleDto){
+        Role updatedRole = this.roleService.updateFromDto(roleDto);
+        return roleMapper.toDto(updatedRole);
+    }
+
     // IntellectualProperty CRUD operations
     public IntellectualPropertyDto addIntellectualProperty(IntellectualPropertyDto ipDto) {
         IntellectualProperty savedIp = this.intellectualPropertyService.saveFromDto(ipDto);
@@ -97,7 +103,6 @@ public class EntitiesCrudService {
     public StakeHolderDto updateStakeHolder(StakeHolderDto stakeHolderDto) {
         // Verify both the StakeHolder and its role exist before updating
         this.stakeHolderService.verify(stakeHolderDto);
-        this.roleService.findById(stakeHolderDto.getRoleId());
         StakeHolder updatedStakeHolder = this.stakeHolderService.updateFromDto(stakeHolderDto);
         return stakeHolderMapper.toDto(updatedStakeHolder);
     }
@@ -124,8 +129,14 @@ public class EntitiesCrudService {
         return intellectualPropertyService.existsById(id);
     }
 
-    public void deleteStakeHolder(Long id){
-        this.stakeHolderService.deleteById(id);
+    public void deleteStakeHolder(Long id){this.stakeHolderService.deleteById(id);}
+
+    public void deleteRole(Long id){this.roleService.deleteById(id);}
+
+    public void deleteIntellectualProperty(Long id){this.intellectualPropertyService.deleteById(id);}
+
+    public boolean stakeHolderExistByRoleId(Long id){
+        return this.stakeHolderService.existByRoleId(id);
     }
 
     public Set<ContractParticipant> findParticipantsByStakeHolderId(Long id){

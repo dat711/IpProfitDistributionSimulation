@@ -21,6 +21,8 @@ import java.util.List;
 public class DtoConstraintsHandlerAspect {
     @Around("@annotation(com.LegalEntitiesManagement.v1.Common.aspects.annotations.CheckRequestBody)")
     public Object handleValidationsResult(ProceedingJoinPoint joinPoint) throws Throwable {
+        System.out.println("This validation cases");
+
         Object[] args = joinPoint.getArgs();
         BindingResult bindingResult = (BindingResult) args[args.length - 1];
         if (!bindingResult.hasErrors()){

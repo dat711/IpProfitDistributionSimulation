@@ -89,6 +89,10 @@ public class IpBasedContractService implements BaseService<IpBasedContract, IpBa
         return ipBasedContractRepository.findIpBasedContractsWhereStakeholderIsExecutor(stakeholderId);
     }
 
+    public boolean existByIpId(Long ipId){
+        return !this.ipBasedContractRepository.getIpBasedContractByIpId(ipId).isEmpty();
+    }
+
     public boolean contractsHavingSameIp(Set<IpBasedContract> contracts){
         if (contracts.isEmpty()){
             return false;

@@ -20,10 +20,13 @@ public class SpecialResponseBody {
     }
 
     public static Map<String, Object> addLink(Class<?> clazz, Object item, String linkTemplate){
-        List<Field> fields = List.of(clazz.getFields());
+        List<Field> fields = List.of(clazz.getDeclaredFields());
         Long id = fields.stream().peek(field -> field.setAccessible(true))
+                .peek(field -> System.out.println("Field name is: " + field.getName()))
                 .filter(field -> field.getName().equals("id"))
                 .mapToLong(field -> {
+                    System.out.println("Field name is " + field.getName());
+
                     try {
                         return (Long) field.get(item);
                     } catch (IllegalAccessException e) {
@@ -42,5 +45,10 @@ public class SpecialResponseBody {
         return items.stream().map(
                 item -> SpecialResponseBody.addLink(clazz, item, linkTemplate)
         ).collect(Collectors.toSet());
+    }
+
+    public static SuccessResponse<Object> getSuccessResponses(Class<?> clazz, Object item, String linkTemplate, String message){
+        Map<String, Object> data = addLink(clazz, item, linkTemplate);
+        return SuccessResponse.successResponse(data,message);
     }
 }

@@ -37,7 +37,7 @@ public class IntellectualPropertyService implements BaseService<IntellectualProp
 
     @Override
     public void deleteById(Long id) {
-        // Not implemented as per requirements
+        this.intellectualPropertyRepository.deleteById(id);
     }
 
     @Override

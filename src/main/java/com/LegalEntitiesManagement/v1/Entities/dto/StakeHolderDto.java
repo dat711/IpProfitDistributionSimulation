@@ -1,5 +1,6 @@
 package com.LegalEntitiesManagement.v1.Entities.dto;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -20,5 +21,6 @@ public class StakeHolderDto {
     private String name;
 
     @NotNull(message = "Role ID is required")
+    @Min(1)
     private Long roleId;
 }

@@ -21,6 +21,7 @@ public class ErrorsHandlerAspect {
 
     @Around("@annotation(com.LegalEntitiesManagement.v1.Common.aspects.annotations.AspectErrorsHandler)")
     public Object HandleException(ProceedingJoinPoint joinPoint) throws Throwable {
+        System.out.println("This error cases");
         try {
             return joinPoint.proceed();
         } catch(Throwable throwable){

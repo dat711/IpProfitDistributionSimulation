@@ -41,7 +41,9 @@ public class RoleService implements BaseService<Role, RoleDto, Long>, Updatable<
     }
 
     @Override
-    public void deleteById(Long id) {}
+    public void deleteById(Long id) {
+        this.roleRepository.deleteById(id);
+    }
 
     @Override
     public List<Role> findAll() {

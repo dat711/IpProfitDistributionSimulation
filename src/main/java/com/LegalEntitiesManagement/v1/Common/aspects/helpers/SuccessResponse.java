@@ -17,4 +17,6 @@ public class SuccessResponse<T> {
         response.setMessage(message);
         return response;
     }
+
+
 }

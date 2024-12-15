@@ -5,8 +5,8 @@ import com.LegalEntitiesManagement.v1.Common.aspects.helpers.ResponseHeadersHelp
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.SpecialResponseBody;
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.SuccessResponse;
 import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ExistsConstraint;
-import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ValidStakeHolderDelete;
-import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ValidStakeHolderUpdate;
+import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ValidDelete;
+import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ValidUpdate;
 import com.LegalEntitiesManagement.v1.Entities.dto.StakeHolderDto;
 import com.LegalEntitiesManagement.v1.Entities.services.EntitiesCrudService;
 import jakarta.validation.Valid;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/stakeholders")
@@ -61,30 +62,27 @@ public class StakeHolderController {
                         new HashSet<>(stakeHolders), "/api/v1/stakeholders/%s"));
     }
 
-
     @PutMapping("/{id}")
     @AspectErrorsHandler
     @CheckRequestBody
+    @ValidUpdate(entity = "stakeholder")
     public ResponseEntity<Object> updateStakeHolder(
             @ExistsConstraint(entity = "stakeholder") @PathVariable long id,
-            @Valid @ValidStakeHolderUpdate @RequestBody StakeHolderDto stakeHolderDto,
+            @Valid @RequestBody StakeHolderDto stakeHolderDto,
             BindingResult bindingResult) {
         stakeHolderDto.setId(id);
         StakeHolderDto updatedStakeHolder = entitiesCrudService.updateStakeHolder(stakeHolderDto);
-        SuccessResponse<StakeHolderDto> successResponse = SuccessResponse.successResponse(
-                updatedStakeHolder,
-                "StakeHolder updated successfully"
-        );
         return ResponseEntity.ok()
                 .headers(ResponseHeadersHelper.getSuccessGetPutHeaders())
-                .body(successResponse);
+                .body(SpecialResponseBody.getSuccessResponses(StakeHolderDto.class, updatedStakeHolder,
+                        "/api/v1/stakeholders","StakeHolder updated successfully"));
     }
 
     @DeleteMapping("/{id}")
     @AspectErrorsHandler
     @CheckRequestBody
-    public ResponseEntity<Object> deleteStakeHolder(@ExistsConstraint(entity = "stakeholder") @ValidStakeHolderDelete
-                                                        @PathVariable long id){
+    public ResponseEntity<Object> deleteStakeHolder(@ExistsConstraint(entity = "stakeholder")
+                                                        @ValidDelete(entity = "stakeholder") @PathVariable long id){
         this.entitiesCrudService.deleteStakeHolder(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .body(SpecialResponseBody.deleteObject("StakeHolder", id));
