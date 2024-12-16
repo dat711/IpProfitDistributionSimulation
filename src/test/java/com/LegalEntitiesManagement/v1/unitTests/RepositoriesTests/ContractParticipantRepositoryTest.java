@@ -263,4 +263,75 @@ public class ContractParticipantRepositoryTest extends BaseRepositoryTestPropert
                 .collect(Collectors.toSet())
                 .containsAll(Set.of(testContract.getId(), testContract2.getId())));
     }
+
+    @Test
+    @Order(9)
+    void testFindParticipantsByContractIds() {
+        // Create a second test contract
+        Contract testContract2 = new Contract(
+                "Test Contract 2",
+                LocalDate.now(),
+                2,
+                testExecutor
+        );
+        testContract2 = contractRepository.save(testContract2);
+
+        // Create participants for both contracts
+        ContractParticipant participant1 = new ContractParticipant(
+                testContract,
+                40.0,
+                false,
+                testParticipant
+        );
+        ContractParticipant participant2 = new ContractParticipant(
+                testContract2,
+                30.0,
+                false,
+                testParticipant
+        );
+        ContractParticipant executor1 = new ContractParticipant(
+                testContract,
+                60.0,
+                true,
+                testExecutor
+        );
+        ContractParticipant executor2 = new ContractParticipant(
+                testContract2,
+                70.0,
+                true,
+                testExecutor
+        );
+
+        // Save all participants
+        contractParticipantRepository.save(participant1);
+        contractParticipantRepository.save(participant2);
+        contractParticipantRepository.save(executor1);
+        contractParticipantRepository.save(executor2);
+
+        // Test finding participants by multiple contract IDs
+        Set<ContractParticipant> foundParticipants = contractParticipantRepository
+                .findParticipantsByContractIds(Set.of(testContract.getId(), testContract2.getId()));
+
+        // Verify results
+        assertNotNull(foundParticipants);
+        assertEquals(4, foundParticipants.size());
+
+        // Check if we have participants from both contracts
+        Set<Long> foundContractIds = foundParticipants.stream()
+                .map(p -> p.getContract().getId())
+                .collect(Collectors.toSet());
+        assertEquals(Set.of(testContract.getId(), testContract2.getId()), foundContractIds);
+
+        // Check if we have both stakeholders in results
+        Set<Long> foundStakeholderIds = foundParticipants.stream()
+                .map(p -> p.getStakeholder().getId())
+                .collect(Collectors.toSet());
+        assertEquals(Set.of(testExecutor.getId(), testParticipant.getId()), foundStakeholderIds);
+
+        // Check if we have correct number of executors and non-executors
+        long executorCount = foundParticipants.stream()
+                .filter(ContractParticipant::getIsExecutor)
+                .count();
+        assertEquals(2, executorCount);
+    }
 }

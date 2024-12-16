@@ -93,6 +93,10 @@ public class IpBasedContractService implements BaseService<IpBasedContract, IpBa
         return !this.ipBasedContractRepository.getIpBasedContractByIpId(ipId).isEmpty();
     }
 
+    public List<IpBasedContract> saveAll(List<IpBasedContract> ipBasedContracts){
+        return this.ipBasedContractRepository.saveAll(ipBasedContracts);
+    }
+
     public boolean contractsHavingSameIp(Set<IpBasedContract> contracts){
         if (contracts.isEmpty()){
             return false;

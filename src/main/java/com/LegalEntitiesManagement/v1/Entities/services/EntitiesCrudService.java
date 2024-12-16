@@ -1,25 +1,19 @@
 package com.LegalEntitiesManagement.v1.Entities.services;
 
-import com.LegalEntitiesManagement.v1.Entities.dto.IntellectualPropertyDto;
-import com.LegalEntitiesManagement.v1.Entities.dto.RoleDto;
-import com.LegalEntitiesManagement.v1.Entities.dto.StakeHolderDto;
+import com.LegalEntitiesManagement.v1.Entities.dto.*;
+import com.LegalEntitiesManagement.v1.Entities.exceptions.ContractNotFoundException;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.IpNotFoundException;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.RoleNotFoundException;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.StakeHolderNotFoundException;
-import com.LegalEntitiesManagement.v1.Entities.model.ContractParticipant;
+import com.LegalEntitiesManagement.v1.Entities.model.*;
 import com.LegalEntitiesManagement.v1.Entities.model.GraphClass.StakeHolderLeaf;
-import com.LegalEntitiesManagement.v1.Entities.model.Role;
-import com.LegalEntitiesManagement.v1.Entities.model.StakeHolder;
 import com.LegalEntitiesManagement.v1.Entities.services.baseServices.*;
 import org.springframework.stereotype.Service;
-import com.LegalEntitiesManagement.v1.Entities.model.IntellectualProperty;
 import org.springframework.transaction.annotation.Transactional;
-import com.LegalEntitiesManagement.v1.Entities.dto.mapper.RoleMapper;
-import com.LegalEntitiesManagement.v1.Entities.dto.mapper.StakeHolderMapper;
-import com.LegalEntitiesManagement.v1.Entities.dto.mapper.IntellectualPropertyMapper;
+import com.LegalEntitiesManagement.v1.Entities.dto.mapper.*;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -43,6 +37,12 @@ public class EntitiesCrudService {
     private final StakeHolderMapper stakeHolderMapper = StakeHolderMapper.INSTANCE;
 
     private final IntellectualPropertyMapper intellectualPropertyMapper = IntellectualPropertyMapper.INSTANCE;
+
+    private final ParticipantMapper participantMapper = ParticipantMapper.INSTANCE;
+
+    private final ContractMapper contractMapper = ContractMapper.INSTANCE;
+
+    private final IpBasedContractMapper ipBasedContractMapper = IpBasedContractMapper.INSTANCE;
 
     public EntitiesCrudService(IntellectualPropertyService intellectualPropertyService, StakeHolderService stakeHolderService, RoleService roleService, BaseContractParticipantService baseContractParticipantService, StakeHolderLeafService stakeHolderLeafService, BaseContractService contractService, GraphBuilderService graphBuilderService, IpBasedContractService ipBasedContractService) {
         this.intellectualPropertyService = intellectualPropertyService;
@@ -189,5 +189,173 @@ public class EntitiesCrudService {
     * - Add method for update and delete respectively with distinguish between ipBasedContractService and contractService
     * */
 
+    public ContractCompositionDto saveContract(ContractCompositionDto contractCompositionDto){
+        ContractDto contractDto = contractCompositionDto.getContractDto();
+        Set<ParticipantDto> participantDtos = contractCompositionDto.getParticipants();
+        Contract savedContract = contractService.saveFromDto(contractDto);
+        List<ContractParticipant> participants = participantMapper.toEntitySet(participantDtos).stream().toList();
+        participants.forEach(participant -> participant.setContract(savedContract));
+        Set<ContractParticipant> savedParticipants = new HashSet<>(baseContractParticipantService.saveAll(participants));
+        return new ContractCompositionDto(contractMapper.toDto(savedContract), participantMapper.toDtoSet(savedParticipants));
+    }
 
+    public ContractCompositionDto getContract(Long id){
+        if (!this.contractService.existsById(id)){
+            throw new ContractNotFoundException(id);
+        }
+
+        Contract contract = this.contractService.findById(id);
+        Set<ContractParticipant> allParticipants = this.baseContractParticipantService.findParticipantsByContractId(id);
+        contract.setContractParticipants(allParticipants);
+        return convertToCompositeDto(contract);
+    }
+
+    private ContractCompositionDto convertToCompositeDto(Contract contract){
+        return new ContractCompositionDto(
+                contractMapper.toDto(contract),
+                participantMapper.toDtoSet(contract.getContractParticipants())
+        );
+    }
+
+    private List<ContractCompositionDto> convertToListCompositeDtos(List<Contract> newContracts){
+        return newContracts.stream().map(
+                contract -> new ContractCompositionDto(
+                        contractMapper.toDto(contract),
+                        participantMapper.toDtoSet(contract.getContractParticipants())
+                )
+        ).toList();
+    }
+
+    private IpBasedContract injectedParticipantPreSavedIpBasedContract(IpBasedContractDto ipBasedContractDto,
+                                                                Set<ParticipantDto> participantDtos){
+        IpBasedContract ipBasedContract = ipBasedContractMapper.toEntity(ipBasedContractDto);
+        Set<ContractParticipant> preSaved = participantMapper.toEntitySet(participantDtos);
+        preSaved.forEach(contractParticipant -> contractParticipant.setContract(ipBasedContract));
+        ipBasedContract.setContractParticipants(preSaved);
+        return ipBasedContract;
+    }
+
+    public IpBasedContractCompositionDto saveIpBasedContract(IpBasedContractCompositionDto ipBasedContractCompositionDto){
+        IpBasedContractDto ipBasedContractDto = ipBasedContractCompositionDto.getContractDto();
+        Set<ParticipantDto> participantDtos = ipBasedContractCompositionDto.getParticipants();
+        Long ipId = ipBasedContractDto.getIpId();
+
+        if (!this.intellectualPropertyService.existsById(ipId)){
+            throw new IllegalArgumentException("The Ip defined in the contract is not existed");
+        }
+
+        IpBasedContract ipBasedContract = injectedParticipantPreSavedIpBasedContract(ipBasedContractDto, participantDtos);
+
+        if(!this.graphBuilderService.ipTreeService.existsById(ipId)){
+            this.graphBuilderService.validateBuildNewTree(Collections.singletonList(ipBasedContract));
+            SavedIpBasedContractDetails savedContractDetails = getSavedIpBasedContractDetails(ipBasedContractDto, participantDtos);
+            IpBasedContract savedContract = savedContractDetails.savedContract;
+            Set<ContractParticipant> savedParticipants = savedContractDetails.participants;
+            this.graphBuilderService.buildNewTree(Collections.singletonList(savedContract));
+            return new IpBasedContractCompositionDto(ipBasedContractMapper.toDto(savedContract),
+                    participantMapper.toDtoSet(savedParticipants));
+        }
+
+        List<IpBasedContract> currentContracts = this.ipBasedContractService.findContractsByIpId(ipId).stream().toList();
+        this.graphBuilderService.validateAddNewContractToExistedTree(Collections.singletonList(ipBasedContract),currentContracts);
+        SavedIpBasedContractDetails savedContractDetails = getSavedIpBasedContractDetails(ipBasedContractDto, participantDtos);
+        IpBasedContract savedContract = savedContractDetails.savedContract;
+        Set<ContractParticipant> savedParticipants = savedContractDetails.participants;
+        this.graphBuilderService.insertContractsToExistedTree(Collections.singletonList(savedContract), currentContracts);
+        return new IpBasedContractCompositionDto(ipBasedContractMapper.toDto(savedContract),
+                participantMapper.toDtoSet(savedParticipants));
+    }
+
+    private record SavedIpBasedContractDetails(IpBasedContract savedContract, Set<ContractParticipant> participants ){}
+
+    private SavedIpBasedContractDetails getSavedIpBasedContractDetails(IpBasedContractDto ipBasedContractDto, Set<ParticipantDto> participantDtos){
+        IpBasedContract savedContract = ipBasedContractService.saveFromDto(ipBasedContractDto);
+        List<ContractParticipant> participants = participantMapper.toEntitySet(participantDtos).stream().toList();
+        participants.forEach(participant -> participant.setContract(savedContract));
+        Set<ContractParticipant> savedParticipants = new HashSet<>(baseContractParticipantService.saveAll(participants));
+        savedContract.setContractParticipants(savedParticipants);
+        return new SavedIpBasedContractDetails(savedContract, savedParticipants);
+    }
+
+    public List<IpBasedContractCompositionDto> savedAllIpBasedContract(List<IpBasedContractCompositionDto> ipBasedContractCompositionDtoList){
+        Long ipId = ipBasedContractCompositionDtoList.get(0).getContractDto().getIpId();
+
+        if (!this.intellectualPropertyService.existsById(ipId)){
+            throw new IllegalArgumentException("The Ip defined in the contract is not existed");
+        }
+
+        ProcessBulkIpBasedContracts processBulkIpBasedContracts = getPreSavedIpBasedContractDetails(ipBasedContractCompositionDtoList);
+
+        if(!this.graphBuilderService.ipTreeService.existsById(ipId)){
+            this.graphBuilderService.validateBuildNewTree(processBulkIpBasedContracts.preSavedIpBasedContracts);
+            List<IpBasedContract> newContracts = saveAllValidIpBasedContract(processBulkIpBasedContracts);
+            this.graphBuilderService.buildNewTree(newContracts.stream().toList());
+            return convertToListIpBasedCompositeDtos(newContracts);
+        }
+        List<IpBasedContract> currentContracts = this.ipBasedContractService.findContractsByIpId(ipId).stream().toList();
+        this.graphBuilderService.validateAddNewContractToExistedTree(processBulkIpBasedContracts.preSavedIpBasedContracts,
+                currentContracts);
+        List<IpBasedContract> newContracts = saveAllValidIpBasedContract(processBulkIpBasedContracts);
+        this.graphBuilderService.insertContractsToExistedTree(newContracts, currentContracts);
+
+        return convertToListIpBasedCompositeDtos(newContracts);
+    }
+
+    private List<IpBasedContractCompositionDto> convertToListIpBasedCompositeDtos(List<IpBasedContract> newContracts){
+        return newContracts.stream().map(
+                contract -> new IpBasedContractCompositionDto(
+                        ipBasedContractMapper.toDto(contract),
+                        participantMapper.toDtoSet(contract.getContractParticipants())
+                )
+        ).toList();
+    }
+
+    private List<IpBasedContract> saveAllValidIpBasedContract(ProcessBulkIpBasedContracts processBulkIpBasedContracts){
+        List<IpBasedContract> savedContract = this.ipBasedContractService
+                .saveAll(processBulkIpBasedContracts.preSavedIpBasedContracts);
+        Map<Integer, Set<ContractParticipant>> mapParticipantsByContractPriority =
+                processBulkIpBasedContracts.mapParticipantsByContractPriority;
+        savedContract.forEach(contract -> {
+            Set<ContractParticipant> participants = mapParticipantsByContractPriority.get(contract.getContractPriority());
+            participants.forEach(participant -> participant.setContract(contract));
+        });
+
+        List<ContractParticipant> allParticipants = mapParticipantsByContractPriority.values()
+                .stream().flatMap(Set::stream).collect(Collectors.toSet()).stream().toList();
+
+        List<ContractParticipant> savedParticipants = this.baseContractParticipantService.saveAll(allParticipants);
+        Map<IpBasedContract, Set<ContractParticipant>> mapParticipantByContract = savedParticipants.stream()
+                .collect(Collectors.groupingBy(ContractParticipant::getContract)).entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> (IpBasedContract) entry.getKey(),
+                        entry -> new HashSet<>(entry.getValue())
+                ));
+        Set<IpBasedContract> newContracts = mapParticipantByContract.keySet();
+        newContracts.forEach(
+                contract -> contract.setContractParticipants(mapParticipantByContract.get(contract))
+        );
+
+        return newContracts.stream().toList();
+    }
+
+    private record ProcessBulkIpBasedContracts(List<IpBasedContract> preSavedIpBasedContracts,
+                                               Map<Integer, Set<ContractParticipant>> mapParticipantsByContractPriority){}
+    private ProcessBulkIpBasedContracts getPreSavedIpBasedContractDetails(List<IpBasedContractCompositionDto> ipBasedContractCompositionDtoList){
+        Map<IpBasedContract, Set<ParticipantDto>> mapParticipantsByContractPreSavedContract = ipBasedContractCompositionDtoList.stream()
+                .collect(Collectors.toMap(
+                        ipBasedContractCompositionDto -> injectedParticipantPreSavedIpBasedContract(
+                                ipBasedContractCompositionDto.getContractDto(), ipBasedContractCompositionDto.getParticipants()
+                        ),
+                        IpBasedContractCompositionDto::getParticipants
+                ));
+
+        Map<Integer, Set<ContractParticipant>> mapParticipantsByContractPriority = mapParticipantsByContractPreSavedContract.entrySet()
+                .stream().collect(Collectors.toMap(
+                        entry -> entry.getKey().getContractPriority(),
+                        entry -> participantMapper.toEntitySet(entry.getValue())
+                ));
+
+        List<IpBasedContract> preSavedIpBasedContracts = mapParticipantsByContractPreSavedContract.keySet().stream().toList();
+        return new ProcessBulkIpBasedContracts(preSavedIpBasedContracts, mapParticipantsByContractPriority);
+    }
 }

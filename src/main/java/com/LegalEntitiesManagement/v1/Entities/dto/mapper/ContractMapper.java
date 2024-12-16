@@ -11,7 +11,6 @@ import java.util.List;
 public interface ContractMapper {
     ContractMapper INSTANCE = Mappers.getMapper(ContractMapper.class);
 
-
     @Mapping(source = "contractPriority", target = "contractPriority")
     @Mapping(source = "executor.id", target = "executorId")
     ContractDto toDto(Contract contract);

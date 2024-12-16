@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
@@ -28,5 +29,6 @@ public interface ContractParticipantRepository extends JpaRepository<ContractPar
     @Query("SELECT cp FROM ContractParticipant cp WHERE cp.stakeholder.id = :stakeholderId")
     Set<ContractParticipant> findByStakeholderId(@Param("stakeholderId") Long stakeholderId);
 
-
+    @Query("SELECT cp FROM ContractParticipant cp WHERE cp.contract.id IN :contractIds")
+    Set<ContractParticipant> findParticipantsByContractIds(@Param("contractIds") Collection<Long> contractIds);
 }

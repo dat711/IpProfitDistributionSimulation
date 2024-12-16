@@ -11,10 +11,10 @@ import com.LegalEntitiesManagement.v1.Entities.services.baseServices.*;
 import java.util.*;
 import java.util.stream.Collectors;
 public class GraphBuilderService {
-    private final IpTreeService ipTreeService;
-    private final ContractNodeService contractNodeService;
-    private final StakeHolderLeafService stakeHolderLeafService;
-    private final ResponsibilityService responsibilityService;
+    final IpTreeService ipTreeService;
+    final ContractNodeService contractNodeService;
+    final StakeHolderLeafService stakeHolderLeafService;
+    final ResponsibilityService responsibilityService;
 
     public GraphBuilderService(IpTreeService ipTreeService, ContractNodeService contractNodeService,
                                StakeHolderLeafService stakeHolderLeafService,
