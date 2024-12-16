@@ -444,4 +444,74 @@ public class EntitiesCrudService {
         List<IpBasedContract> preSavedIpBasedContracts = mapParticipantsByContractPreSavedContract.keySet().stream().toList();
         return new ProcessBulkIpBasedContracts(preSavedIpBasedContracts, mapParticipantsByContractPriority);
     }
+
+    public IpBasedContractCompositionDto updateIpBasedContract(IpBasedContractCompositionDto ipBasedContractCompositionDto) {
+        IpBasedContractDto ipBasedContractDto = ipBasedContractCompositionDto.getContractDto();
+        Set<ParticipantDto> participantDtos = ipBasedContractCompositionDto.getParticipants();
+
+        if (!this.ipBasedContractService.existsById(ipBasedContractDto.getId())) {
+            throw new ContractNotFoundException(ipBasedContractDto.getId());
+        }
+
+        // Get current state of contracts in the tree
+        List<IpBasedContract> treeContracts = this.ipBasedContractService
+                .findContractsByIpId(ipBasedContractDto.getIpId())
+                .stream().toList();
+
+        // Create new contract state for validation
+        IpBasedContract newContract = injectedParticipantPreSavedIpBasedContract(ipBasedContractDto, participantDtos);
+
+        // Validate update is possible
+        this.graphBuilderService.validateUpdateContract(newContract, treeContracts);
+
+        // Save contract and participants
+        IpBasedContract savedContract = ipBasedContractService.updateFromDto(ipBasedContractDto);
+        Set<ContractParticipant> allOldParticipants = this.baseContractParticipantService
+                .findParticipantsByContractId(savedContract.getId());
+
+        // Get participants to update/delete
+        Set<ContractParticipant> newParticipants = participantMapper.toEntitySet(participantDtos);
+        newParticipants.forEach(participant -> participant.setContract(savedContract));
+        UpdateParticipantsInfo updateInfo = getUpdateParticipantsDetails(newParticipants, allOldParticipants);
+
+        // Delete old participants
+        this.baseContractParticipantService.deleteAll(updateInfo.toDeleteParticipants());
+
+        // Save updated participants
+        Set<ContractParticipant> updatedParticipants = new HashSet<>(
+                this.baseContractParticipantService.saveAll(updateInfo.toUpdateParticipants())
+        );
+        savedContract.setContractParticipants(updatedParticipants);
+
+        // Update graph structure
+        this.graphBuilderService.updateContract(savedContract, treeContracts);
+
+        return new IpBasedContractCompositionDto(
+                ipBasedContractMapper.toDto(savedContract),
+                participantMapper.toDtoSet(updatedParticipants)
+        );
+    }
+
+    public void deleteIpBasedContract(Long id) {
+        if (!this.ipBasedContractService.existsById(id)) {
+            throw new ContractNotFoundException(id);
+        }
+
+        IpBasedContract contract = this.ipBasedContractService.findById(id);
+        List<IpBasedContract> treeContracts = this.ipBasedContractService
+                .findContractsByIpId(contract.getIntellectualProperty().getId())
+                .stream().toList();
+
+        // Validate if contract can be deleted
+        this.graphBuilderService.validateDeleteContract(contract);
+
+        // Update graph structure before deletion
+        this.graphBuilderService.updateDeleteContract(contract);
+
+        // Delete contract participants
+        this.baseContractParticipantService.deleteAllByContractId(id);
+
+        // Delete the contract
+        this.ipBasedContractService.deleteById(id);
+    }
 }
