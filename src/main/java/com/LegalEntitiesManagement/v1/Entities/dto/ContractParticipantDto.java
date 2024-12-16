@@ -22,6 +22,12 @@ public class ContractParticipantDto {
         this.percentage = percentage;
         this.isExecutor = isExecutor;
     }
+
+    public ContractParticipantDto(Long stakeholderId, Double percentage, Boolean isExecutor) {
+        this.stakeholderId = stakeholderId;
+        this.percentage = percentage;
+        this.isExecutor = isExecutor;
+    }
 }
 
 

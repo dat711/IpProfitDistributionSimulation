@@ -10,8 +10,6 @@ import jakarta.validation.constraints.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ParticipantDto {
-    private Long id;
-
     @NotBlank(message = "The stakeholder id must be provided")
     private Long stakeholderId;
 
@@ -22,10 +20,4 @@ public class ParticipantDto {
 
     @NotBlank(message = "The participant must be specified if being the contract executor")
     private Boolean isExecutor;
-
-    public ParticipantDto(Long stakeholderId, Double percentage, Boolean isExecutor) {
-        this.stakeholderId = stakeholderId;
-        this.percentage = percentage;
-        this.isExecutor = isExecutor;
-    }
 }

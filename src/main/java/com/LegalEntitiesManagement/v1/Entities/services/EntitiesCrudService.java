@@ -177,4 +177,17 @@ public class EntitiesCrudService {
     public Set<ContractParticipant> findParticipantsByStakeHolderId(Long id){
         return this.baseContractParticipantService.findByStakeholderId(id);
     }
+
+    /*To do:
+    * - Create a method to map between ParticipantDto and Contract Participant, the contract can be unsaved in the post step
+    * when inject to the graphBuilderService, the validation step do not need the contract id from the participant
+    * - Create a method to showcase the graph model
+    * - Create a method to transform the return contracts to the new composite dto
+    * - Create a method to validate if the contract is fit to be converted to ipBasedContractDto
+    * - Finish TotalBenefit Validator
+    * - Add method for adding ipBasedContracts in batch.
+    * - Add method for update and delete respectively with distinguish between ipBasedContractService and contractService
+    * */
+
+
 }
