@@ -334,4 +334,49 @@ public class ContractParticipantRepositoryTest extends BaseRepositoryTestPropert
                 .count();
         assertEquals(2, executorCount);
     }
+
+    @Test
+    @Order(10)
+    void testDeleteAllByContractId() {
+        // Create multiple participants for the test contract
+        ContractParticipant executor = new ContractParticipant(
+                testContract,
+                60.0,
+                true,
+                testExecutor
+        );
+        ContractParticipant participant = new ContractParticipant(
+                testContract,
+                40.0,
+                false,
+                testParticipant
+        );
+
+        // Save the participants
+        contractParticipantRepository.save(executor);
+        contractParticipantRepository.save(participant);
+
+        // Verify participants exist before deletion
+        Set<ContractParticipant> beforeDeletion = contractParticipantRepository
+                .findParticipantsByContractId(testContract.getId());
+        assertEquals(2, beforeDeletion.size());
+
+        // Perform the deletion
+        contractParticipantRepository.deleteAllByContractId(testContract.getId());
+
+        // Verify all participants for the contract were deleted
+        Set<ContractParticipant> afterDeletion = contractParticipantRepository
+                .findParticipantsByContractId(testContract.getId());
+        assertTrue(afterDeletion.isEmpty());
+
+        // Test deleting from a contract with no participants (should not throw exception)
+        Contract emptyContract = new Contract(
+                "Empty Contract",
+                LocalDate.now(),
+                3,
+                testExecutor
+        );
+        emptyContract = contractRepository.save(emptyContract);
+        contractParticipantRepository.deleteAllByContractId(emptyContract.getId());
+    }
 }

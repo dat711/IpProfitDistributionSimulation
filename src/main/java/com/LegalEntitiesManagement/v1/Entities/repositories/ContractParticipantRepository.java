@@ -2,6 +2,7 @@ package com.LegalEntitiesManagement.v1.Entities.repositories;
 
 import com.LegalEntitiesManagement.v1.Entities.model.ContractParticipant;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -31,4 +32,8 @@ public interface ContractParticipantRepository extends JpaRepository<ContractPar
 
     @Query("SELECT cp FROM ContractParticipant cp WHERE cp.contract.id IN :contractIds")
     Set<ContractParticipant> findParticipantsByContractIds(@Param("contractIds") Collection<Long> contractIds);
+
+    @Query("DELETE FROM ContractParticipant cp WHERE cp.contract.id = :contractId")
+    @Modifying
+    void deleteAllByContractId(@Param("contractId") Long contractId);
 }

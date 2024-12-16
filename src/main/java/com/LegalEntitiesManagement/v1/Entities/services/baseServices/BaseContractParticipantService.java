@@ -10,10 +10,7 @@ import com.LegalEntitiesManagement.v1.Entities.model.IpBasedContract;
 import com.LegalEntitiesManagement.v1.Entities.repositories.ContractParticipantRepository;
 import com.LegalEntitiesManagement.v1.Entities.services.UtilService;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -120,5 +117,13 @@ public class BaseContractParticipantService implements BaseService<ContractParti
         return injectParticipantToContracts(contracts.stream().map(Contract.class::cast)
                 .collect(Collectors.toSet()))
                 .stream().map(IpBasedContract.class::cast).collect(Collectors.toSet());
+    }
+
+    public void deleteAll(Collection<ContractParticipant> participants){
+        this.participantRepository.deleteAll(participants);
+    }
+
+    public void deleteAllByContractId(Long id){
+        this.participantRepository.deleteAllByContractId(id);
     }
 }

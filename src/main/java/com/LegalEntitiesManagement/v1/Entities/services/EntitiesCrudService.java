@@ -8,6 +8,7 @@ import com.LegalEntitiesManagement.v1.Entities.exceptions.StakeHolderNotFoundExc
 import com.LegalEntitiesManagement.v1.Entities.model.*;
 import com.LegalEntitiesManagement.v1.Entities.model.GraphClass.StakeHolderLeaf;
 import com.LegalEntitiesManagement.v1.Entities.services.baseServices.*;
+import jakarta.transaction.NotSupportedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.LegalEntitiesManagement.v1.Entities.dto.mapper.*;
@@ -208,6 +209,91 @@ public class EntitiesCrudService {
         Set<ContractParticipant> allParticipants = this.baseContractParticipantService.findParticipantsByContractId(id);
         contract.setContractParticipants(allParticipants);
         return convertToCompositeDto(contract);
+    }
+
+    public List<ContractCompositionDto> getAllContracts(){
+        List<Contract> contracts = this.contractService.findAll();
+        return this.baseContractParticipantService.injectParticipantToContracts(new HashSet<>(contracts))
+                .stream().map(this::convertToCompositeDto).toList();
+    }
+
+    public ContractCompositionDto updateContract(ContractCompositionDto contractCompositionDto){
+        ContractDto contractDto = contractCompositionDto.getContractDto();
+        if (this.ipBasedContractService.existByIpId(contractDto.getId())){
+            throw new IllegalCallerException("The request is attempted to update an IpBasedContract, should add appropriate request params to the URI");
+        }
+        Contract contract = contractMapper.toEntity(contractDto);
+        Set<ContractParticipant> allOldParticipants = this.baseContractParticipantService
+                .findParticipantsByContractId(contract.getId());
+        Set<ContractParticipant> newParticipants = this.participantMapper.toEntitySet(contractCompositionDto.getParticipants());
+        newParticipants.forEach(participant -> participant.setContract(contract));
+        UpdateParticipantsInfo updateParticipantsInfo = getUpdateParticipantsDetails(newParticipants, allOldParticipants);
+
+        this.baseContractParticipantService.deleteAll(updateParticipantsInfo.toDeleteParticipants);
+        Contract savedContract = contractService.save(contract);
+        Set<ContractParticipant> updatedParticipants = new HashSet<>(this.baseContractParticipantService
+                .saveAll(updateParticipantsInfo.toUpdateParticipants));
+        savedContract.setContractParticipants(updatedParticipants);
+        return convertToCompositeDto(contract);
+    }
+
+    /*
+    * To do: add repository method to delete all contract participants related to a contract
+    * Add method to update, delete ipBased Contract
+    * Add class to represent Tree as json
+    * Add code to document the endpoints with openAPI
+    * Good to have: Add class and endpoints to simulate money splitting
+    * Do some small stuff to understand Spring security.
+    * */
+
+    public void deleteContract (ContractCompositionDto contractCompositionDto){
+        ContractDto contractDto = contractCompositionDto.getContractDto();
+        if (this.ipBasedContractService.existByIpId(contractDto.getId())){
+            throw new IllegalCallerException("The request is attempted to update an IpBasedContract, should add appropriate request params to the URI");
+        }
+
+        if(!this.contractService.existsById(contractDto.getId())){
+            throw new ContractNotFoundException(contractDto.getId());
+        }
+
+        this.contractService.deleteById(contractDto.getId());
+        this.baseContractParticipantService.deleteAllByContractId(contractDto.getId());
+    }
+
+    private record UpdateParticipantsInfo(Set<ContractParticipant> toDeleteParticipants,
+                                          List<ContractParticipant> toUpdateParticipants){}
+
+    private UpdateParticipantsInfo getUpdateParticipantsDetails(Set<ContractParticipant> newParticipants,
+                                                                Set<ContractParticipant> oldParticipants){
+        Set<StakeHolder> newParticipantStakeHolders = newParticipants.stream().map(ContractParticipant::getStakeholder)
+                .collect(Collectors.toSet());
+
+        Map<StakeHolder, Double> newPercentage =  newParticipants.stream().collect(Collectors.toMap(
+                ContractParticipant::getStakeholder,
+                ContractParticipant::getPercentage
+        ));
+
+        Set<ContractParticipant> toDeleteParticipants = oldParticipants.stream().filter(
+                participant -> !newParticipantStakeHolders.contains(participant.getStakeholder())
+        ).collect(Collectors.toSet());
+
+        Set<ContractParticipant> toUpdateParticipants = oldParticipants.stream().filter(
+                 participant -> newParticipantStakeHolders.contains(participant.getStakeholder())).filter(
+                         participant -> !Objects.equals(participant.getPercentage(), newPercentage.get(participant))
+                ).collect(Collectors.toSet());
+
+        toUpdateParticipants.forEach(
+                participant -> participant.setPercentage(newPercentage.get(participant))
+        );
+
+        Set<StakeHolder> oldParticipantStakeHolders = oldParticipants.stream().map(ContractParticipant::getStakeholder)
+                .collect(Collectors.toSet());
+
+        toUpdateParticipants.addAll(newParticipants.stream().filter(
+                participant -> !oldParticipantStakeHolders.contains(participant.getStakeholder())
+        ).collect(Collectors.toSet()));
+
+        return new UpdateParticipantsInfo(toDeleteParticipants, toUpdateParticipants.stream().toList());
     }
 
     private ContractCompositionDto convertToCompositeDto(Contract contract){

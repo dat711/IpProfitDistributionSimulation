@@ -10,13 +10,15 @@ import org.springframework.http.ResponseEntity;
 public class ErrorsHandlerAspect {
     private ResponseEntity<ProblemDetail> notFoundProblemDetail(RuntimeException e){
         boolean notFound = e.getMessage().contains("Cannot find");
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
+        ProblemDetail problemDetail = notFound ? ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage())
+                : ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
         String[] classNamePath = e.getClass().getName().split("\\.");
         String className = classNamePath[classNamePath.length -1];
         problemDetail.setTitle(String.format("The Error: %s occur" ,className));
 
-        return notFound ? ResponseEntity.status(HttpStatus.NOT_FOUND).headers(ResponseHeadersHelper.getBaseHeaders()).body(problemDetail)
-                : ResponseEntity.status(HttpStatus.BAD_REQUEST).headers(ResponseHeadersHelper.getBaseHeaders()).body(problemDetail);
+        return notFound ? ResponseEntity.status(HttpStatus.NOT_FOUND).headers(ResponseHeadersHelper.getBaseHeaders())
+                .body(problemDetail) : ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .headers(ResponseHeadersHelper.getBaseHeaders()).body(problemDetail);
     }
 
     @Around("@annotation(com.LegalEntitiesManagement.v1.Common.aspects.annotations.AspectErrorsHandler)")
@@ -27,7 +29,15 @@ public class ErrorsHandlerAspect {
         } catch(Throwable throwable){
             assert throwable instanceof RuntimeException;
             RuntimeException e = (RuntimeException) throwable;
-            return this.notFoundProblemDetail(e);
+            return e instanceof IllegalCallerException ? this.notSupportedMethodProblemDetail( (IllegalCallerException) e)
+                    : this.notFoundProblemDetail(e);
         }
+    }
+
+    private ResponseEntity<ProblemDetail> notSupportedMethodProblemDetail(IllegalCallerException e){
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.METHOD_NOT_ALLOWED, e.getMessage());
+        problemDetail.setTitle("The request is try to performed un-allowed modification");
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).headers(ResponseHeadersHelper.getBaseHeaders())
+                .body(problemDetail);
     }
 }
