@@ -8,7 +8,6 @@ import com.LegalEntitiesManagement.v1.Entities.exceptions.StakeHolderNotFoundExc
 import com.LegalEntitiesManagement.v1.Entities.model.*;
 import com.LegalEntitiesManagement.v1.Entities.model.GraphClass.StakeHolderLeaf;
 import com.LegalEntitiesManagement.v1.Entities.services.baseServices.*;
-import jakarta.transaction.NotSupportedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.LegalEntitiesManagement.v1.Entities.dto.mapper.*;
@@ -337,6 +336,7 @@ public class EntitiesCrudService {
             SavedIpBasedContractDetails savedContractDetails = getSavedIpBasedContractDetails(ipBasedContractDto, participantDtos);
             IpBasedContract savedContract = savedContractDetails.savedContract;
             Set<ContractParticipant> savedParticipants = savedContractDetails.participants;
+            System.out.println("Build new tree");
             this.graphBuilderService.buildNewTree(Collections.singletonList(savedContract));
             return new IpBasedContractCompositionDto(ipBasedContractMapper.toDto(savedContract),
                     participantMapper.toDtoSet(savedParticipants));

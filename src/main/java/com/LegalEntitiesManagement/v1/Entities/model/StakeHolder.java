@@ -39,7 +39,7 @@ public class StakeHolder {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id,"StakeHolder", name, role.getId());
+        return Objects.hash(id,"StakeHolder");
     }
 
     @Override
