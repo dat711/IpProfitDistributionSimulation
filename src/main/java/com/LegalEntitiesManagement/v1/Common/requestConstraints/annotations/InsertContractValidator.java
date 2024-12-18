@@ -9,14 +9,12 @@ import jakarta.validation.ConstraintValidatorContext;
 public class InsertContractValidator implements ConstraintValidator<IpBasedContractInsertValidator, IpBasedContractCompositionDto> {
     @Override
     public boolean isValid(IpBasedContractCompositionDto request, ConstraintValidatorContext context ){
-        System.out.println("Do check null field");
         DtoInsertChecking.NullInsertErrorDetails nullInsertErrorDetails = DtoInsertChecking
                 .isInsertRequestValid(request.getContractDto().getClass(), request.getContractDto());
 
         boolean isValid = nullInsertErrorDetails.isValid();
 
         if (!isValid){
-            System.out.println("Go here ??");
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate(nullInsertErrorDetails.message())
                     .addPropertyNode("Null-fields:").addConstraintViolation();

@@ -9,7 +9,6 @@ import java.util.Set;
 public class TotalBenefitValidator implements ConstraintValidator<ValidTotalBenefit, Set<ParticipantDto>>{
     @Override
     public boolean isValid(Set<ParticipantDto> field, ConstraintValidatorContext context ){
-        System.out.println("Do validate total benefit ");
         double total = field.stream().mapToDouble(ParticipantDto::getPercentage).sum();
 
         if (field.isEmpty()){

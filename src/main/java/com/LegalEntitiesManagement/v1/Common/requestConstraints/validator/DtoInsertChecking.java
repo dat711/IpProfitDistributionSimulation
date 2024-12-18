@@ -17,14 +17,10 @@ public class DtoInsertChecking {
                 .peek(field -> field.setAccessible(true))
                 .filter(field -> !field.getName().equals("id"))
                 .allMatch(field -> {
-                    System.out.println("Validating field: " + field.getName());
                     try {
-                        System.out.println("Field value is: " + field.get(request));
                         if(field.get(request) != null){
-                            System.out.println("Field is not null");
                             return true;
                         }
-                        System.out.println("Field is null");
                         nullFields.add(field.getName());
                         return false;
                     } catch (IllegalAccessException e) {
