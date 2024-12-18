@@ -31,7 +31,6 @@ public class UpdateValidator implements ConstraintValidator<ValidUpdate, Object[
     @Override
     public boolean isValid(Object[] parameter, ConstraintValidatorContext context) {
         Long id = (Long) parameter[0];
-        System.out.println("Still okay");
         if(entity.equals("stakeholder")){
             return canUpdateStakeHolder(id, (StakeHolderDto) parameter[1], context);
         }
@@ -44,7 +43,6 @@ public class UpdateValidator implements ConstraintValidator<ValidUpdate, Object[
     }
 
     private boolean canUpdateRole(Long id, RoleDto updateDto, ConstraintValidatorContext context){
-        System.out.println("Come here");
         if (updateDto == null) {
             return false;
         }

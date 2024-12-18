@@ -2,7 +2,7 @@ package com.LegalEntitiesManagement.v1.Entities.exceptions;
 
 public class CreateContractPartyException extends RuntimeException{
 
-    private static final String nullEntityIdMessage = "THe entity id must not be null";
+    private static final String nullEntityIdMessage = "The entity id must not be null";
     private static final String nullEntityObjectMessage = "The entity must not be null";
     private static final String invalidTypeMessage = "The entity must either be a contract or a stakeholder";
     public enum ExceptionType{

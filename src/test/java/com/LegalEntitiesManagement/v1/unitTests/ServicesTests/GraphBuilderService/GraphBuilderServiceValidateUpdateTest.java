@@ -196,7 +196,6 @@ public class GraphBuilderServiceValidateUpdateTest {
         ContractValidationFailed exception = assertThrows(ContractValidationFailed.class, () ->
                 graphBuilderService.validateUpdateContract(updatedContract, treeContracts)
         );
-        System.out.println(exception.getMessage());
         assertTrue(exception.getMessage().contains("duplicated non-executors with other branches"));
 
     }

@@ -56,9 +56,6 @@ public class TestDbServerConfiguration {
     }
 
     private static void runMigrations(String path) throws SQLException {
-        System.out.println("---------------------------------------");
-        System.out.println("Running the migrations with single path of the set up");
-        System.out.println("---------------------------------------");
         Flyway flyway = Flyway.configure()
                 .dataSource(dataSource)
                 .locations(path)
@@ -67,9 +64,6 @@ public class TestDbServerConfiguration {
     }
 
     private static void runMigrations(String[] paths) throws SQLException {
-        System.out.println("---------------------------------------");
-        System.out.println("Running the migrations with multiple paths of the set up");
-        System.out.println("---------------------------------------");
         Flyway flyway = Flyway.configure()
                 .dataSource(dataSource)
                 .locations(paths)
@@ -79,16 +73,8 @@ public class TestDbServerConfiguration {
 
     private static void showFlyWayConnection(Flyway flyway) throws SQLException {
         DataSource ds = flyway.getConfiguration().getDataSource();
-        showDataSourceStates(ds);
     }
 
-    private static void showDataSourceStates(DataSource ds){
-        if (ds == null){
-            System.out.println(	"The connection is null is: True" );
-            return;
-        }
-        System.out.println(	"The connection is null is: False" );
-    }
 
     private static void cleanDatabase() throws SQLException {
         Flyway flyway = Flyway.configure()
@@ -123,9 +109,6 @@ public class TestDbServerConfiguration {
     public static class EmbeddedPostgresExtension implements AfterAllCallback, BeforeAllCallback {
         @Override
         public void afterAll(ExtensionContext context) throws Exception {
-            System.out.println("---------------------------------------");
-            System.out.println("Running the after all of the set up");
-            System.out.println("---------------------------------------");
             if (dataSource == null) {
                 return;
             }
@@ -133,13 +116,7 @@ public class TestDbServerConfiguration {
         }
 
         private Class<?> traverseClassHierachy(Class<?> testClass) {
-            System.out.println("---------------------------------------");
-            System.out.println("The current class is " + testClass.toString() );
-            System.out.println("---------------------------------------");
             if(testClass.isMemberClass()){
-                System.out.println("---------------------------------------");
-                System.out.println("The current class is a member class");
-                System.out.println("---------------------------------------");
                 return traverseClassHierachy(testClass.getDeclaringClass());
             }
             return testClass;

@@ -2,6 +2,7 @@ package com.LegalEntitiesManagement.v1.unitTests.ControllersTests;
 
 import com.LegalEntitiesManagement.v1.Entities.controllers.IntellectualPropertyController;
 import com.LegalEntitiesManagement.v1.Entities.dto.IntellectualPropertyDto;
+import com.LegalEntitiesManagement.v1.Entities.exceptions.IpNotFoundException;
 import com.LegalEntitiesManagement.v1.Entities.services.EntitiesCrudService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;

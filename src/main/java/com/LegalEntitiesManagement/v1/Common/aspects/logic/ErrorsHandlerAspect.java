@@ -1,15 +1,22 @@
 package com.LegalEntitiesManagement.v1.Common.aspects.logic;
 
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.ResponseHeadersHelper;
+import jakarta.annotation.PostConstruct;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
+@Aspect
+@Component
 public class ErrorsHandlerAspect {
+
     private ResponseEntity<ProblemDetail> notFoundProblemDetail(RuntimeException e){
-        boolean notFound = e.getMessage().contains("Cannot find");
+        boolean notFound = e.getMessage().contains("Can not find");
         ProblemDetail problemDetail = notFound ? ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage())
                 : ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
         String[] classNamePath = e.getClass().getName().split("\\.");
@@ -23,7 +30,6 @@ public class ErrorsHandlerAspect {
 
     @Around("@annotation(com.LegalEntitiesManagement.v1.Common.aspects.annotations.AspectErrorsHandler)")
     public Object HandleException(ProceedingJoinPoint joinPoint) throws Throwable {
-        System.out.println("This error cases");
         try {
             return joinPoint.proceed();
         } catch(Throwable throwable){

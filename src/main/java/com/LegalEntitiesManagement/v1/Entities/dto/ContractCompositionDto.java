@@ -14,9 +14,10 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 public class ContractCompositionDto {
-    @NotNull
+    @NotNull(message = "The contract must be specified")
     ContractDto contractDto;
 
+    @NotNull(message = "The participants must be specified")
     @ValidTotalBenefit
     Set<ParticipantDto> participants;
 }

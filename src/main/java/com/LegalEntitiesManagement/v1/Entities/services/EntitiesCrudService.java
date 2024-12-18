@@ -245,18 +245,19 @@ public class EntitiesCrudService {
     * Do some small stuff to understand Spring security.
     * */
 
-    public void deleteContract (ContractCompositionDto contractCompositionDto){
-        ContractDto contractDto = contractCompositionDto.getContractDto();
-        if (this.ipBasedContractService.existByIpId(contractDto.getId())){
+    public void deleteContract (Long id ){
+        if (this.ipBasedContractService.existByIpId(id)){
             throw new IllegalCallerException("The request is attempted to update an IpBasedContract, should add appropriate request params to the URI");
         }
 
-        if(!this.contractService.existsById(contractDto.getId())){
-            throw new ContractNotFoundException(contractDto.getId());
-        }
+        this.contractService.deleteById(id);
+        this.baseContractParticipantService.deleteAllByContractId(id);
+    }
 
-        this.contractService.deleteById(contractDto.getId());
-        this.baseContractParticipantService.deleteAllByContractId(contractDto.getId());
+    public List<IpBasedContractCompositionDto> getAllIpBasedContracts() {
+        List<IpBasedContract> contracts = this.ipBasedContractService.findAll();
+        return this.baseContractParticipantService.injectParticipantsToIpBasedContracts(new HashSet<>(contracts))
+                .stream().map(this::convertToIpBasedContractCompositionDto).toList();
     }
 
     private record UpdateParticipantsInfo(Set<ContractParticipant> toDeleteParticipants,
@@ -302,13 +303,19 @@ public class EntitiesCrudService {
         );
     }
 
-    private List<ContractCompositionDto> convertToListCompositeDtos(List<Contract> newContracts){
-        return newContracts.stream().map(
-                contract -> new ContractCompositionDto(
-                        contractMapper.toDto(contract),
-                        participantMapper.toDtoSet(contract.getContractParticipants())
-                )
-        ).toList();
+    private IpBasedContractCompositionDto convertToIpBasedContractCompositionDto(IpBasedContract contract){
+        return new IpBasedContractCompositionDto(
+                ipBasedContractMapper.toDto(contract),
+                participantMapper.toDtoSet(contract.getContractParticipants())
+        );
+    }
+
+    public IpBasedContractCompositionDto getIpBasedContract(Long id){
+        IpBasedContract ipBasedContract = this.ipBasedContractService.findById(id);
+        Set<ContractParticipant> allParticipants = this.baseContractParticipantService.findParticipantsByContractId(id);
+        return new IpBasedContractCompositionDto(ipBasedContractMapper.toDto(ipBasedContract),
+                participantMapper.toDtoSet(allParticipants)
+        );
     }
 
     private IpBasedContract injectedParticipantPreSavedIpBasedContract(IpBasedContractDto ipBasedContractDto,
@@ -336,7 +343,6 @@ public class EntitiesCrudService {
             SavedIpBasedContractDetails savedContractDetails = getSavedIpBasedContractDetails(ipBasedContractDto, participantDtos);
             IpBasedContract savedContract = savedContractDetails.savedContract;
             Set<ContractParticipant> savedParticipants = savedContractDetails.participants;
-            System.out.println("Build new tree");
             this.graphBuilderService.buildNewTree(Collections.singletonList(savedContract));
             return new IpBasedContractCompositionDto(ipBasedContractMapper.toDto(savedContract),
                     participantMapper.toDtoSet(savedParticipants));
@@ -498,9 +504,6 @@ public class EntitiesCrudService {
         }
 
         IpBasedContract contract = this.ipBasedContractService.findById(id);
-        List<IpBasedContract> treeContracts = this.ipBasedContractService
-                .findContractsByIpId(contract.getIntellectualProperty().getId())
-                .stream().toList();
 
         // Validate if contract can be deleted
         this.graphBuilderService.validateDeleteContract(contract);

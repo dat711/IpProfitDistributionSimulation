@@ -106,10 +106,6 @@ public class MoneyNodeBranchBuilderTest {
             mapLeaves.putAll(TestDataFactory.genMapLeaves(moneyNodeCounter, participants.stream().filter(
                     participant -> !participant.equals(topExecutor)).toArray(StakeHolder[]::new)));
 
-            if (participants.get(0).equals(participants.get(1))){
-                System.out.println("Overlap bug");
-            }
-
             List<IpBasedContract> contracts = TestDataFactory.genBranchContracts(
                     topExecutor, contractParticipants, ip, ipBasedContractCounter, participantCounter);
 

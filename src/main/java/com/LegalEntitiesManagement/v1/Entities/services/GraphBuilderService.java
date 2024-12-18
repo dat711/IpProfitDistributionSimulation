@@ -796,7 +796,6 @@ public class GraphBuilderService {
                                              Map<StakeHolder, StakeHolderLeaf> leavesMap, Boolean addToOriginal){
         List<Branch> newBranchesList = addToOriginal ? toAddBranches : treeBranches;
         Set<Branch> newBranches = new HashSet<>(newBranchesList);
-        System.out.println("New branches size is: " + newBranches.size());
         Branch toAddOverlap = toAddBranches.get(0);
         Branch treeOverlap = treeBranches.stream()
                 .filter(branch -> branch.getExecutor().equals(toAddOverlap.getExecutor()))
@@ -841,21 +840,17 @@ public class GraphBuilderService {
         StakeHolder topCurrentBranchesExecutor = currentBranches.get(0).getExecutor();
 
         if (isLeaf(topNewBranchesExecutor, sortedNewBranches)){
-            System.out.println("Case add new tree to the current branch, with the top new being leaf");
             mergeToLeaf(currentBranches, sortedNewBranches, leavesMap, false);
             return;
         }
         if (isLeaf(topCurrentBranchesExecutor, currentBranches)){
-            System.out.println("Case add current tree to the new branch, with the top current being leaf");
             mergeToLeaf(sortedNewBranches, currentBranches, leavesMap, true);
             return;
         }
         if (isBranch(topCurrentBranchesExecutor, sortedNewBranches)){
-            System.out.println("Case add current tree to the new branch, with the top current being a branch of the target tree");
             mergeToBranch(currentBranches, sortedNewBranches, leavesMap, false);
             return;
         }
-        System.out.println("Case add new tree to the current branch, with the top new being a branch of the target tree");
         mergeToBranch(sortedNewBranches, currentBranches, leavesMap, true);
     }
 
@@ -876,4 +871,6 @@ public class GraphBuilderService {
         Map<StakeHolder, StakeHolderLeaf> leavesMap = stakeHolderLeafService.getLeaves(allParticipant);
         addNewBranchGroups(connectedGroupsNewBranch, currentBranches, leavesMap);
     }
+
+
 }

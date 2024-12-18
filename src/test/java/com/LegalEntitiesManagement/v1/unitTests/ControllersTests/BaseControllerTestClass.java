@@ -9,8 +9,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration(classes = V1Application.class)
-@Import({DtoConstraintsHandlerAspect.class,
+@EnableAspectJAutoProxy(proxyTargetClass = true)
+@Import({
         ErrorsHandlerAspect.class,
+        DtoConstraintsHandlerAspect.class,
         DtoInsertChecking.class,
         TotalBenefitValidator.class,
         UpdateValidator.class

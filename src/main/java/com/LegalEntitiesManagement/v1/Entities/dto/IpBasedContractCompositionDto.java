@@ -1,5 +1,7 @@
 package com.LegalEntitiesManagement.v1.Entities.dto;
 
+import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.Marker.BatchValidation;
+import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.Marker.SingleValidation;
 import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ValidTotalBenefit;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,9 +17,10 @@ import java.util.Set;
 @Getter
 @Setter
 public class IpBasedContractCompositionDto {
-    @NotNull
+    @NotNull(message = "The contract must be specified", groups = {SingleValidation.class, BatchValidation.class})
     IpBasedContractDto contractDto;
 
-    @ValidTotalBenefit
+    @NotNull(message = "The participants must be specified")
+    @ValidTotalBenefit(groups = {SingleValidation.class})
     Set<ParticipantDto> participants;
 }
