@@ -18,7 +18,7 @@ public class IntellectualPropertyDto {
     @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
     private String name;
 
-    @NotBlank(message = "Name is required")
-    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
+    @NotBlank(message = "Description is required")
+    @Size(min = 2, max = 50, message = "Description must be between 2 and 50 characters")
     private String description;
 }
