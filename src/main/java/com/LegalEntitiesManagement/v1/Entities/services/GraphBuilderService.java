@@ -10,9 +10,12 @@ import com.LegalEntitiesManagement.v1.Entities.model.GraphClass.*;
 import com.LegalEntitiesManagement.v1.Entities.model.supportClass.*;
 import com.LegalEntitiesManagement.v1.Entities.model.supportClass.MoneyNodeBranch.*;
 import com.LegalEntitiesManagement.v1.Entities.services.baseServices.*;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+@Service
 public class GraphBuilderService {
     final IpTreeService ipTreeService;
     final ContractNodeService contractNodeService;
