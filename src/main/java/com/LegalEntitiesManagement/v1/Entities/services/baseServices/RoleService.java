@@ -10,7 +10,9 @@ import com.LegalEntitiesManagement.v1.Common.Proxies.Updatable;
 import java.util.List;
 import com.LegalEntitiesManagement.v1.Entities.services.UtilService;
 import com.LegalEntitiesManagement.v1.Common.Proxies.BaseService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class RoleService implements BaseService<Role, RoleDto, Long>, Updatable<Role, RoleDto> {
     private final RoleRepository roleRepository;
 

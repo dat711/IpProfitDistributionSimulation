@@ -9,10 +9,12 @@ import com.LegalEntitiesManagement.v1.Entities.model.GraphClass.ContractNode;
 import com.LegalEntitiesManagement.v1.Entities.model.GraphClass.MoneyNode;
 import com.LegalEntitiesManagement.v1.Entities.repositories.ContractNodeRepository;
 import com.LegalEntitiesManagement.v1.Entities.services.UtilService;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
 public class ContractNodeService implements BaseService<ContractNode, ContractNodeDto, Long> {
     private final ContractNodeRepository contractNodeRepository;
     private final ContractNodeMapper contractNodeMapper = ContractNodeMapper.INSTANCE;

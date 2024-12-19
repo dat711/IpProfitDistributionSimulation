@@ -6,11 +6,12 @@ import com.LegalEntitiesManagement.v1.Entities.exceptions.IpTreeNotFoundExceptio
 import com.LegalEntitiesManagement.v1.Entities.model.GraphClass.IpTree;
 import com.LegalEntitiesManagement.v1.Entities.repositories.IpTreeRepository;
 import com.LegalEntitiesManagement.v1.Entities.services.UtilService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-
+@Service
 public class IpTreeService implements BaseService<IpTree, IpTreeDto, Long>{
     private final IpTreeRepository ipTreeRepository;
     private final IpTreeMapper ipTreeMapper = IpTreeMapper.INSTANCE;

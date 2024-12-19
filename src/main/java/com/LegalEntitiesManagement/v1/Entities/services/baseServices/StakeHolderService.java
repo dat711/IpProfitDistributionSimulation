@@ -9,11 +9,12 @@ import com.LegalEntitiesManagement.v1.Common.Proxies.Updatable;
 import com.LegalEntitiesManagement.v1.Entities.dto.mapper.StakeHolderMapper;
 import com.LegalEntitiesManagement.v1.Entities.dto.StakeHolderDto;
 import com.LegalEntitiesManagement.v1.Entities.services.UtilService;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-
+@Service
 public class StakeHolderService implements BaseService<StakeHolder, StakeHolderDto, Long>,
         Updatable<StakeHolder, StakeHolderDto> {
     private final StakeHolderRepository stakeHolderRepository;

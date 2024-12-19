@@ -7,9 +7,11 @@ import com.LegalEntitiesManagement.v1.Entities.model.IntellectualProperty;
 import com.LegalEntitiesManagement.v1.Entities.repositories.IntellectualPropertyRepository;
 import com.LegalEntitiesManagement.v1.Entities.services.UtilService;
 import com.LegalEntitiesManagement.v1.Common.Proxies.BaseService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class IntellectualPropertyService implements BaseService<IntellectualProperty, IntellectualPropertyDto, Long>,
         Updatable<IntellectualProperty, IntellectualPropertyDto> {
     private final IntellectualPropertyRepository intellectualPropertyRepository;

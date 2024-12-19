@@ -7,12 +7,14 @@ import com.LegalEntitiesManagement.v1.Entities.exceptions.ResponsibilityNotFound
 import com.LegalEntitiesManagement.v1.Entities.model.GraphClass.Responsibility;
 import com.LegalEntitiesManagement.v1.Entities.repositories.ResponsibilityRepository;
 import com.LegalEntitiesManagement.v1.Entities.services.UtilService;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+@Service
 public class ResponsibilityService implements BaseService<Responsibility, ResponsibilityDto, Long>{
     private final ResponsibilityRepository responsibilityRepository;
     private final ResponsibilityMapper responsibilitiesMapper = ResponsibilityMapper.INSTANCE;

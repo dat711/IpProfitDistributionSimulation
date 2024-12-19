@@ -9,10 +9,12 @@ import com.LegalEntitiesManagement.v1.Entities.model.StakeHolder;
 import com.LegalEntitiesManagement.v1.Entities.repositories.StakeHolderLeafRepository;
 import com.LegalEntitiesManagement.v1.Entities.services.UtilService;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.GraphViolatedException.StakeHolderLeafNotRegisteredException;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
 public class StakeHolderLeafService implements BaseService<StakeHolderLeaf, StakeHolderLeafDto, Long> {
     private final StakeHolderLeafRepository stakeHolderLeafRepository;
     private final StakeHolderLeafMapper stakeHolderLeafMapper = StakeHolderLeafMapper.INSTANCE;

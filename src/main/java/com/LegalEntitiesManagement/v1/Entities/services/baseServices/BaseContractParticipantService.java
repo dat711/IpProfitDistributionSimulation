@@ -9,11 +9,12 @@ import com.LegalEntitiesManagement.v1.Entities.model.ContractParticipant;
 import com.LegalEntitiesManagement.v1.Entities.model.IpBasedContract;
 import com.LegalEntitiesManagement.v1.Entities.repositories.ContractParticipantRepository;
 import com.LegalEntitiesManagement.v1.Entities.services.UtilService;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-
+@Service
 public class BaseContractParticipantService implements BaseService<ContractParticipant, ContractParticipantDto, Long> {
     protected final ContractParticipantRepository participantRepository;
     protected final StakeHolderService stakeHolderService;

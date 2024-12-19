@@ -8,10 +8,12 @@ import com.LegalEntitiesManagement.v1.Entities.model.IntellectualProperty;
 import com.LegalEntitiesManagement.v1.Entities.model.IpBasedContract;
 import com.LegalEntitiesManagement.v1.Entities.repositories.IpBasedContractRepository;
 import com.LegalEntitiesManagement.v1.Entities.services.UtilService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
 
+@Service
 public class IpBasedContractService implements BaseService<IpBasedContract, IpBasedContractDto, Long>,
         Updatable<IpBasedContract, IpBasedContractDto>{
     private final IpBasedContractRepository ipBasedContractRepository;
