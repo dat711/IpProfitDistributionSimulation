@@ -89,12 +89,11 @@ public class IntellectualPropertyController {
     @AspectErrorsHandler
     public ResponseEntity<Object> getTreeRepresentation(@PathVariable long id){
         TreeInfo info = this.entitiesCrudService.getTreeRepresentation(id);
-        ResponseEntity.ok()
+        return ResponseEntity.ok()
                 .headers(ResponseHeadersHelper.getSuccessGetPutHeaders())
                 .body(SuccessResponse.successResponse(
                         info,
                         "IP distribution tree retrieved successfully"
                 ));
-    }
     }
 }
