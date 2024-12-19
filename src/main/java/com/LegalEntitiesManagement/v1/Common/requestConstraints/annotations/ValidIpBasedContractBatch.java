@@ -13,4 +13,14 @@ public @interface ValidIpBasedContractBatch {
     String message() default "Invalid IP-based contract batch";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
+
+    @Documented
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.TYPE, ElementType.PARAMETER, ElementType.METHOD})
+    @Constraint(validatedBy = IpBasedContractBatchValidator.InsertContractValidator.class)
+    @interface IpBasedContractInsertValidator {
+        String message() default "There exist null field in the post request";
+        Class<?>[] groups() default {};
+        Class<? extends Payload>[] payload() default {};
+    }
 }

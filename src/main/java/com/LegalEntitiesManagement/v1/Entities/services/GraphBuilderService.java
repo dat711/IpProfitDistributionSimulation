@@ -1,4 +1,7 @@
 package com.LegalEntitiesManagement.v1.Entities.services;
+import com.LegalEntitiesManagement.v1.Entities.dto.TreeRepresentation.*;
+import com.LegalEntitiesManagement.v1.Entities.dto.mapper.IpBasedContractMapper;
+import com.LegalEntitiesManagement.v1.Entities.dto.mapper.StakeHolderMapper;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.ContractNodeNotFoundException;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.ContractViolatedException.ContractValidationFailed;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.IpTreeNotFoundException;
@@ -872,5 +875,48 @@ public class GraphBuilderService {
         addNewBranchGroups(connectedGroupsNewBranch, currentBranches, leavesMap);
     }
 
+    public NodeDto getTreeRepresentation(IntellectualProperty ip){
+        IpTree tree = ipTreeService.findByIntellectualPropertyId(ip.getId()).orElseThrow(
+                () -> new IllegalStateException(String.format("The intellectualProperty with id: %s is not having any tree registered", ip.getId()))
+        );
+
+        ContractNode root = tree.getRootContractNode();
+        return processNode(root);
+    }
+
+    private NodeDto processNode(ContractNode node){
+        Set<Responsibility> responsibilities = responsibilityService.findDownstreamEdges(node.getId());
+        String link = String.format("/api/v1/ip-contracts/%s",node.getContract().getId());
+
+        Set<Responsibility> leafResponsibilities = responsibilities.stream().filter(
+                responsibility -> responsibility.getTarget() instanceof StakeHolderLeaf
+        ).collect(Collectors.toSet());
+
+        Set<Responsibility> contractNodeResponsibilities = responsibilities.stream().filter(
+                responsibility -> responsibility.getTarget() instanceof ContractNode
+        ).collect(Collectors.toSet());
+
+        List<DownStreamReceiver> receivers = leafResponsibilities.stream().map(
+                leafResponsibility -> {
+                    StakeHolderLeaf target =  (StakeHolderLeaf) leafResponsibility.getTarget();
+                    StakeHolder stakeHolder = target.getStakeHolder();
+                    String leafLink = String.format("/api/v1/stakeholders/%s", stakeHolder.getId());
+                    Double percentage = leafResponsibility.getPercentage();
+                    return new DownStreamReceiver(leafLink, StakeHolderMapper.INSTANCE.toDto(stakeHolder), percentage);
+                }
+        ).toList();
+
+        List<DownStreamNodeDetail> downStreamNodeDetails =  contractNodeResponsibilities.stream().map(
+                contractNodeResponsibility -> {
+                    ContractNode target = (ContractNode) contractNodeResponsibility.getTarget();
+                    Double percentage = contractNodeResponsibility.getPercentage();
+                    NodeDto nodeInfo = processNode(target);
+                    return new DownStreamNodeDetail(nodeInfo, percentage);
+                }
+        ).toList();
+
+        return new NodeDto(link, IpBasedContractMapper.INSTANCE.toDto((IpBasedContract) node.getContract()),
+                receivers, downStreamNodeDetails);
+    }
 
 }

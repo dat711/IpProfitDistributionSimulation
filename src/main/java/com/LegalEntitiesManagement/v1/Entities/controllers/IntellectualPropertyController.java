@@ -5,6 +5,7 @@ import com.LegalEntitiesManagement.v1.Common.aspects.helpers.ResponseHeadersHelp
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.SpecialResponseBody;
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.SuccessResponse;
 import com.LegalEntitiesManagement.v1.Entities.dto.IntellectualPropertyDto;
+import com.LegalEntitiesManagement.v1.Entities.dto.TreeRepresentation.TreeInfo;
 import com.LegalEntitiesManagement.v1.Entities.services.EntitiesCrudService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -82,5 +83,18 @@ public class IntellectualPropertyController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                 .headers(ResponseHeadersHelper.getBaseHeaders())
                 .body(SpecialResponseBody.deleteObject("Intellectual Property", id));
+    }
+
+    @GetMapping("/details/{id}")
+    @AspectErrorsHandler
+    public ResponseEntity<Object> getTreeRepresentation(@PathVariable long id){
+        TreeInfo info = this.entitiesCrudService.getTreeRepresentation(id);
+        ResponseEntity.ok()
+                .headers(ResponseHeadersHelper.getSuccessGetPutHeaders())
+                .body(SuccessResponse.successResponse(
+                        info,
+                        "IP distribution tree retrieved successfully"
+                ));
+    }
     }
 }

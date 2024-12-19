@@ -1,6 +1,7 @@
 package com.LegalEntitiesManagement.v1.Entities.services;
 
 import com.LegalEntitiesManagement.v1.Entities.dto.*;
+import com.LegalEntitiesManagement.v1.Entities.dto.TreeRepresentation.TreeInfo;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.ContractNotFoundException;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.IpNotFoundException;
 import com.LegalEntitiesManagement.v1.Entities.exceptions.RoleNotFoundException;
@@ -130,10 +131,6 @@ public class EntitiesCrudService {
 
     public boolean stakeholderExists(Long id) {
         return stakeHolderService.existsById(id);
-    }
-
-    public boolean intellectualPropertyExists(Long id) {
-        return intellectualPropertyService.existsById(id);
     }
 
     public void deleteStakeHolder(Long id){
@@ -516,5 +513,16 @@ public class EntitiesCrudService {
 
         // Delete the contract
         this.ipBasedContractService.deleteById(id);
+    }
+
+    // tree representation
+    public TreeInfo getTreeRepresentation(Long ipId){
+        IntellectualProperty ip = this.intellectualPropertyService.findById(ipId);
+        String ipLink = String.format("/api/v1/intellectual-properties/%s", ipId);
+        return new TreeInfo(
+                ipLink,
+                intellectualPropertyMapper.toDto(ip),
+                this.graphBuilderService.getTreeRepresentation(ip)
+        );
     }
 }

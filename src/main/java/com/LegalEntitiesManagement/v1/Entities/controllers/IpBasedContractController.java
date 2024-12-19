@@ -4,7 +4,6 @@ import com.LegalEntitiesManagement.v1.Common.aspects.annotations.CheckRequestBod
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.ResponseHeadersHelper;
 import com.LegalEntitiesManagement.v1.Common.aspects.helpers.SpecialResponseBody;
 import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ValidIpBasedContractBatch;
-import com.LegalEntitiesManagement.v1.Common.requestConstraints.validator.IpBasedContractInsertValidator;
 import com.LegalEntitiesManagement.v1.Entities.dto.IpBasedContractCompositionDto;
 import com.LegalEntitiesManagement.v1.Entities.services.EntitiesCrudService;
 import jakarta.validation.Valid;
@@ -17,7 +16,6 @@ import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.Mark
 import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.Marker.BatchValidation;
 
 import java.util.List;
-import java.util.HashSet;
 
 @RestController
 @RequestMapping("/api/v1/ip-contracts")
@@ -32,7 +30,7 @@ public class IpBasedContractController {
     @AspectErrorsHandler
     @CheckRequestBody
     public ResponseEntity<Object> createIpBasedContract(
-            @Valid @Validated(SingleValidation.class) @IpBasedContractInsertValidator
+            @Valid @Validated(SingleValidation.class) @ValidIpBasedContractBatch.IpBasedContractInsertValidator
             @RequestBody IpBasedContractCompositionDto contractDto,
             BindingResult bindingResult) {
 

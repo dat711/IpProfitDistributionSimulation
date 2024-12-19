@@ -1,6 +1,5 @@
 package com.LegalEntitiesManagement.v1.Common.requestConstraints.validator;
 
-import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.Marker.SingleValidation;
 import com.LegalEntitiesManagement.v1.Entities.dto.IpBasedContractCompositionDto;
 import com.LegalEntitiesManagement.v1.Entities.dto.ParticipantDto;
 import jakarta.validation.ConstraintValidator;
@@ -8,7 +7,6 @@ import jakarta.validation.ConstraintValidatorContext;
 import com.LegalEntitiesManagement.v1.Common.requestConstraints.annotations.ValidIpBasedContractBatch;
 
 import java.util.List;
-import java.util.Set;
 
 public class IpBasedContractBatchValidator implements ConstraintValidator<ValidIpBasedContractBatch, List<IpBasedContractCompositionDto>> {
 
@@ -71,5 +69,23 @@ public class IpBasedContractBatchValidator implements ConstraintValidator<ValidI
                 .sum();
 
         return Math.abs(total - 1.0) < 0.0001; // Using small epsilon for double comparison
+    }
+
+    public static class InsertContractValidator implements ConstraintValidator<ValidIpBasedContractBatch.IpBasedContractInsertValidator, IpBasedContractCompositionDto> {
+        @Override
+        public boolean isValid(IpBasedContractCompositionDto request, ConstraintValidatorContext context ){
+            DtoInsertChecking.NullInsertErrorDetails nullInsertErrorDetails = DtoInsertChecking
+                    .isInsertRequestValid(request.getContractDto().getClass(), request.getContractDto());
+
+            boolean isValid = nullInsertErrorDetails.isValid();
+
+            if (!isValid){
+                context.disableDefaultConstraintViolation();
+                context.buildConstraintViolationWithTemplate(nullInsertErrorDetails.message())
+                        .addPropertyNode("Null-fields:").addConstraintViolation();
+            }
+
+            return isValid;
+        }
     }
 }
