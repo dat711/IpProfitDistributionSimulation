@@ -18,7 +18,7 @@ import java.util.Set;
 @Setter
 public class IpBasedContractCompositionDto {
     @NotNull(message = "The contract must be specified", groups = {SingleValidation.class, BatchValidation.class})
-    IpBasedContractDto contractDto;
+    IpBasedContractDto contractDetail;
 
     @NotNull(message = "The participants must be specified")
     @ValidTotalBenefit(groups = {SingleValidation.class})

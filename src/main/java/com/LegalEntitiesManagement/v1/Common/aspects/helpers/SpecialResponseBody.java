@@ -56,7 +56,7 @@ public class SpecialResponseBody {
     // for contract
 
     public static  Map<String, Object> addLinkToContractComposition(ContractCompositionDto dto, String linkTemplate){
-        Long id = dto.getContractDto().getId();
+        Long id = dto.getContractDetail().getId();
         String link = String.format( "%s/%s",linkTemplate, id);
         HashMap<String, Object> addedLink = new HashMap<>();
         addedLink.put("Link", link);
@@ -65,7 +65,7 @@ public class SpecialResponseBody {
     }
 
     public static Map<String, Object> addLinkToIpBasedContractComposition(IpBasedContractCompositionDto dto, String linkTemplate){
-        Long id = dto.getContractDto().getId();
+        Long id = dto.getContractDetail().getId();
         String link = String.format( "%s/%s",linkTemplate, id);
         HashMap<String, Object> addedLink = new HashMap<>();
         addedLink.put("Link", link);

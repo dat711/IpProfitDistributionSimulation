@@ -36,7 +36,7 @@ public class StandardContractController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .headers(ResponseHeadersHelper.getSuccessPostHeaders(
                         String.format("/api/v1/standard-contracts/%s",
-                                savedContract.getContractDto().getId())))
+                                savedContract.getContractDetail().getId())))
                 .body(SpecialResponseBody.getSuccessResponseContract(
                         savedContract,
                         "/api/v1/standard-contracts",
@@ -61,7 +61,7 @@ public class StandardContractController {
             @RequestBody ContractCompositionDto contractDto,
             BindingResult bindingResult) {
 
-        contractDto.getContractDto().setId(id);
+        contractDto.getContractDetail().setId(id);
         ContractCompositionDto updatedContract = entitiesCrudService.updateContract(contractDto);
         return ResponseEntity.ok()
                 .headers(ResponseHeadersHelper.getSuccessGetPutHeaders())

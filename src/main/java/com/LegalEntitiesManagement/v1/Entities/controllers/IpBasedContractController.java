@@ -38,7 +38,7 @@ public class IpBasedContractController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .headers(ResponseHeadersHelper.getSuccessPostHeaders(
                         String.format("/api/v1/ip-contracts/%s",
-                                savedContract.getContractDto().getId())))
+                                savedContract.getContractDetail().getId())))
                 .body(SpecialResponseBody.getSuccessResponseIpBasedContract(
                         savedContract,
                         "/api/v1/ip-contracts",
@@ -80,7 +80,7 @@ public class IpBasedContractController {
             @RequestBody IpBasedContractCompositionDto contractDto,
             BindingResult bindingResult) {
 
-        contractDto.getContractDto().setId(id);
+        contractDto.getContractDetail().setId(id);
         IpBasedContractCompositionDto updatedContract = entitiesCrudService.updateIpBasedContract(contractDto);
         return ResponseEntity.ok()
                 .headers(ResponseHeadersHelper.getSuccessGetPutHeaders())

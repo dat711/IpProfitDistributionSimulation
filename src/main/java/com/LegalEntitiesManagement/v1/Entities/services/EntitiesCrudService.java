@@ -187,7 +187,7 @@ public class EntitiesCrudService {
     * */
 
     public ContractCompositionDto saveContract(ContractCompositionDto contractCompositionDto){
-        ContractDto contractDto = contractCompositionDto.getContractDto();
+        ContractDto contractDto = contractCompositionDto.getContractDetail();
         Set<ParticipantDto> participantDtos = contractCompositionDto.getParticipants();
         Contract savedContract = contractService.saveFromDto(contractDto);
         List<ContractParticipant> participants = participantMapper.toEntitySet(participantDtos).stream().toList();
@@ -214,7 +214,7 @@ public class EntitiesCrudService {
     }
 
     public ContractCompositionDto updateContract(ContractCompositionDto contractCompositionDto){
-        ContractDto contractDto = contractCompositionDto.getContractDto();
+        ContractDto contractDto = contractCompositionDto.getContractDetail();
         if (this.ipBasedContractService.existByIpId(contractDto.getId())){
             throw new IllegalCallerException("The request is attempted to update an IpBasedContract, should add appropriate request params to the URI");
         }
@@ -325,7 +325,7 @@ public class EntitiesCrudService {
     }
 
     public IpBasedContractCompositionDto saveIpBasedContract(IpBasedContractCompositionDto ipBasedContractCompositionDto){
-        IpBasedContractDto ipBasedContractDto = ipBasedContractCompositionDto.getContractDto();
+        IpBasedContractDto ipBasedContractDto = ipBasedContractCompositionDto.getContractDetail();
         Set<ParticipantDto> participantDtos = ipBasedContractCompositionDto.getParticipants();
         Long ipId = ipBasedContractDto.getIpId();
 
@@ -367,7 +367,7 @@ public class EntitiesCrudService {
     }
 
     public List<IpBasedContractCompositionDto> savedAllIpBasedContract(List<IpBasedContractCompositionDto> ipBasedContractCompositionDtoList){
-        Long ipId = ipBasedContractCompositionDtoList.get(0).getContractDto().getIpId();
+        Long ipId = ipBasedContractCompositionDtoList.get(0).getContractDetail().getIpId();
 
         if (!this.intellectualPropertyService.existsById(ipId)){
             throw new IllegalArgumentException("The Ip defined in the contract is not existed");
@@ -433,7 +433,7 @@ public class EntitiesCrudService {
         Map<IpBasedContract, Set<ParticipantDto>> mapParticipantsByContractPreSavedContract = ipBasedContractCompositionDtoList.stream()
                 .collect(Collectors.toMap(
                         ipBasedContractCompositionDto -> injectedParticipantPreSavedIpBasedContract(
-                                ipBasedContractCompositionDto.getContractDto(), ipBasedContractCompositionDto.getParticipants()
+                                ipBasedContractCompositionDto.getContractDetail(), ipBasedContractCompositionDto.getParticipants()
                         ),
                         IpBasedContractCompositionDto::getParticipants
                 ));
@@ -449,7 +449,7 @@ public class EntitiesCrudService {
     }
 
     public IpBasedContractCompositionDto updateIpBasedContract(IpBasedContractCompositionDto ipBasedContractCompositionDto) {
-        IpBasedContractDto ipBasedContractDto = ipBasedContractCompositionDto.getContractDto();
+        IpBasedContractDto ipBasedContractDto = ipBasedContractCompositionDto.getContractDetail();
         Set<ParticipantDto> participantDtos = ipBasedContractCompositionDto.getParticipants();
 
         if (!this.ipBasedContractService.existsById(ipBasedContractDto.getId())) {

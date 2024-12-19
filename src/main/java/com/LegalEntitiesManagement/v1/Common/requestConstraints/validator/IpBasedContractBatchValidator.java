@@ -32,19 +32,19 @@ public class IpBasedContractBatchValidator implements ConstraintValidator<ValidI
     }
 
     private boolean validateSingleContract(IpBasedContractCompositionDto dto){
-        if (dto.getContractDto().getIpId() == null || dto.getContractDto().getIpId() < 1){
+        if (dto.getContractDetail().getIpId() == null || dto.getContractDetail().getIpId() < 1){
             return false;
         }
 
-        if (dto.getContractDto().getContractPriority() == null || dto.getContractDto().getContractPriority() < 0){
+        if (dto.getContractDetail().getContractPriority() == null || dto.getContractDetail().getContractPriority() < 0){
             return false;
         }
 
-        if (dto.getContractDto().getContractActiveDate() == null ){
+        if (dto.getContractDetail().getContractActiveDate() == null ){
             return false;
         }
 
-        if (dto.getContractDto().getDescription() == null || dto.getContractDto().getDescription().trim().isEmpty()){
+        if (dto.getContractDetail().getDescription() == null || dto.getContractDetail().getDescription().trim().isEmpty()){
             return false;
         }
 
@@ -75,7 +75,7 @@ public class IpBasedContractBatchValidator implements ConstraintValidator<ValidI
         @Override
         public boolean isValid(IpBasedContractCompositionDto request, ConstraintValidatorContext context ){
             DtoInsertChecking.NullInsertErrorDetails nullInsertErrorDetails = DtoInsertChecking
-                    .isInsertRequestValid(request.getContractDto().getClass(), request.getContractDto());
+                    .isInsertRequestValid(request.getContractDetail().getClass(), request.getContractDetail());
 
             boolean isValid = nullInsertErrorDetails.isValid();
 
