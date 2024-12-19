@@ -11,16 +11,18 @@ import com.LegalEntitiesManagement.v1.Entities.model.supportClass.*;
 import com.LegalEntitiesManagement.v1.Entities.model.supportClass.MoneyNodeBranch.*;
 import com.LegalEntitiesManagement.v1.Entities.services.baseServices.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class GraphBuilderService {
-    final IpTreeService ipTreeService;
-    final ContractNodeService contractNodeService;
-    final StakeHolderLeafService stakeHolderLeafService;
-    final ResponsibilityService responsibilityService;
+    private final IpTreeService ipTreeService;
+    private final ContractNodeService contractNodeService;
+    private final StakeHolderLeafService stakeHolderLeafService;
+    private final ResponsibilityService responsibilityService;
 
     public GraphBuilderService(IpTreeService ipTreeService, ContractNodeService contractNodeService,
                                StakeHolderLeafService stakeHolderLeafService,
@@ -29,6 +31,10 @@ public class GraphBuilderService {
         this.contractNodeService = contractNodeService;
         this.stakeHolderLeafService = stakeHolderLeafService;
         this.responsibilityService = responsibilityService;
+    }
+
+    public boolean existTreeWithIpId(Long id){
+        return ipTreeService.existsByIntellectualPropertyId(id);
     }
 
     /*
@@ -229,7 +235,7 @@ public class GraphBuilderService {
 
     private ContractNode getFullContractNode(IpBasedContract contract){
         ContractNode contractNode = contractNodeService.findByContractId(contract.getId())
-                .orElseThrow(() -> new ContractValidationFailed("The contract attempt to delete do not have a registered ContractNode"));
+                .orElseThrow();
         Set<Responsibility> responsibilities = responsibilityService.findDownstreamEdges(contractNode.getId());
         contractNode.setDownStreamEdges(responsibilities);
         return contractNode;
@@ -364,7 +370,7 @@ public class GraphBuilderService {
 
     private boolean violateUpdateUniqueNonExecutor(Branch currentBranch, Set<StakeHolder> newStakeHolders) {
         return newStakeHolders.isEmpty() || newStakeHolders.stream()
-                .anyMatch(stakeHolder -> currentBranch.getNonExecutorSet().contains(stakeHolder));
+                .anyMatch(stakeHolder -> isContainingStakeHolder(currentBranch.getNonExecutorSet(), stakeHolder));
     }
 
     private void validateUpdateUniqueNonExecutor(Branch currentBranch, Set<StakeHolder> newStakeHolders){
@@ -384,7 +390,7 @@ public class GraphBuilderService {
 
     private boolean affectDownStreamConnection(Set<StakeHolder> affectedStakeHolder, List<Branch> otherBranches){
         Set<StakeHolder> executors = otherBranches.stream().map(Branch::getExecutor).collect(Collectors.toSet());
-        return executors.stream().anyMatch(affectedStakeHolder::contains);
+        return executors.stream().anyMatch(executor -> isContainingStakeHolder(affectedStakeHolder, executor));
     }
 
     private void validateAffectedDownStreamConnection(Set<StakeHolder> affectedStakeHolder, List<Branch> otherBranches){
@@ -397,7 +403,7 @@ public class GraphBuilderService {
     private boolean containDuplicatedNonExecutor(Set<StakeHolder> affectedStakeHolder, List<Branch> otherBranches){
         Set<StakeHolder> otherNonExecutor = otherBranches.stream().map(Branch::getNonExecutorSet).flatMap(Set::stream)
                 .collect(Collectors.toSet());
-        return otherNonExecutor.stream().anyMatch(affectedStakeHolder::contains);
+        return otherNonExecutor.stream().anyMatch(nonExecutor -> isContainingStakeHolder(affectedStakeHolder, nonExecutor));
     }
 
     private void validateDuplicatedNonExecutor(Set<StakeHolder> affectedStakeHolder, List<Branch> otherBranches){
@@ -621,8 +627,8 @@ public class GraphBuilderService {
 
     private boolean violateNoConnection(Set<StakeHolder> newNonExecutorStakeHolder, Set<StakeHolder> oldNonExecutorsStakeHolder,
                                        StakeHolder newBranchesTopExecutor, StakeHolder oldBranchesTopExecutor){
-        return !newNonExecutorStakeHolder.contains(oldBranchesTopExecutor)
-                && !oldNonExecutorsStakeHolder.contains(newBranchesTopExecutor);
+        return newNonExecutorStakeHolder.stream().noneMatch(executor -> executor.getId().equals(oldBranchesTopExecutor.getId()))
+                && oldNonExecutorsStakeHolder.stream().noneMatch(executor -> executor.getId().equals(newBranchesTopExecutor.getId()));
     }
 
     private boolean violateMergeBranch(Branch souceMergeBranch, Collection<Branch> targetMergeBranches,
@@ -718,14 +724,18 @@ public class GraphBuilderService {
         Set<StakeHolder> treeLeaves = tree.stream().map(Branch::getNonExecutorSet).flatMap(Set::stream)
                 .collect(Collectors.toSet());
         treeExecutors.retainAll(treeLeaves);
-        if (treeExecutors.contains(topAdditionalExecutor)){return false;}
+        if (isContainingStakeHolder(treeExecutors, topAdditionalExecutor)){return false;}
         treeLeaves.removeAll(treeExecutors);
-        return treeLeaves.contains(topAdditionalExecutor);
+        return isContainingStakeHolder(treeLeaves, topAdditionalExecutor);
+    }
+
+    private boolean isContainingStakeHolder(Set<StakeHolder> group, StakeHolder target){
+        return group.stream().anyMatch(stakeHolder -> stakeHolder.getId().equals(target.getId()));
     }
 
     private boolean isBranch(StakeHolder topAdditionalExecutor, List<Branch> tree){
         Set<StakeHolder> treeExecutors = tree.stream().map(Branch::getExecutor).collect(Collectors.toSet());
-        return treeExecutors.contains(topAdditionalExecutor);
+        return isContainingStakeHolder(treeExecutors, topAdditionalExecutor);
     }
 
     /* Step to merge two tree when they do not have joint branch (the condition is already checked)
@@ -845,18 +855,22 @@ public class GraphBuilderService {
         StakeHolder topNewBranchesExecutor = sortedNewBranches.get(0).getExecutor();
         StakeHolder topCurrentBranchesExecutor = currentBranches.get(0).getExecutor();
 
-        if (isLeaf(topNewBranchesExecutor, sortedNewBranches)){
-            mergeToLeaf(currentBranches, sortedNewBranches, leavesMap, false);
+        if (isLeaf(topNewBranchesExecutor, currentBranches)){
+            // if current branches having root executor as leaf of new branches
+            mergeToLeaf(sortedNewBranches, currentBranches , leavesMap, false);
             return;
         }
-        if (isLeaf(topCurrentBranchesExecutor, currentBranches)){
-            mergeToLeaf(sortedNewBranches, currentBranches, leavesMap, true);
+        if (isLeaf(topCurrentBranchesExecutor, sortedNewBranches)){
+            // if new branches having root executor as leaf of current branches
+            mergeToLeaf(currentBranches, sortedNewBranches, leavesMap, true);
             return;
         }
         if (isBranch(topCurrentBranchesExecutor, sortedNewBranches)){
+            // if current branches having root executor as an executor of new branches
             mergeToBranch(currentBranches, sortedNewBranches, leavesMap, false);
             return;
         }
+        // if new branches having root executor as an executor of current branches
         mergeToBranch(sortedNewBranches, currentBranches, leavesMap, true);
     }
 

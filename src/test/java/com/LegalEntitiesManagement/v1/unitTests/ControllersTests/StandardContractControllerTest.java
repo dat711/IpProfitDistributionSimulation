@@ -138,7 +138,7 @@ public class StandardContractControllerTest extends BaseControllerTestClass {
     void whenUpdateExistingContract_thenSuccess() throws Exception {
         // Given
         Long contractId = 1L;
-        testContractComposition.getContractDto().setId(contractId);
+        testContractComposition.getContractDetail().setId(contractId);
         when(entitiesCrudService.updateContract(any(ContractCompositionDto.class)))
                 .thenReturn(testContractComposition);
 
@@ -158,7 +158,7 @@ public class StandardContractControllerTest extends BaseControllerTestClass {
     void whenUpdateNonExistingContract_thenNotFound() throws Exception {
         // Given
         Long contractId = 999L;
-        testContractComposition.getContractDto().setId(contractId);
+        testContractComposition.getContractDetail().setId(contractId);
         doThrow(new ContractNotFoundException(contractId))
                 .when(entitiesCrudService).updateContract(any(ContractCompositionDto.class));
 
@@ -179,7 +179,7 @@ public class StandardContractControllerTest extends BaseControllerTestClass {
     void whenDeleteExistingContract_thenSuccess() throws Exception {
         // Given
         Long contractId = 1L;
-        testContractComposition.getContractDto().setId(contractId);
+        testContractComposition.getContractDetail().setId(contractId);
         when(entitiesCrudService.getContract(contractId)).thenReturn(testContractComposition);
         doNothing().when(entitiesCrudService).deleteContract(anyLong());
 

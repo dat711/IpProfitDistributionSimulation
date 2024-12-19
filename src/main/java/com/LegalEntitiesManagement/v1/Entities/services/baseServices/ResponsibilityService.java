@@ -31,7 +31,9 @@ public class ResponsibilityService implements BaseService<Responsibility, Respon
 
     @Override
     public Responsibility save(Responsibility responsibility) {
-        return responsibilityRepository.save(responsibility);
+        Responsibility saved = responsibilityRepository.save(responsibility);
+        responsibilityRepository.flush();
+        return saved;
     }
 
     @Override
@@ -82,7 +84,9 @@ public class ResponsibilityService implements BaseService<Responsibility, Respon
     }
 
     public List<Responsibility> saveAll(Iterable<Responsibility> responsibilities){
-        return this.responsibilityRepository.saveAll(responsibilities);
+        List<Responsibility> saved = this.responsibilityRepository.saveAll(responsibilities);
+        responsibilityRepository.flush();
+        return saved;
     }
 
     public void deleteAll(Iterable<Responsibility> responsibilities){

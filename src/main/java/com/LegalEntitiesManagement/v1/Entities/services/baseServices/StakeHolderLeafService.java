@@ -31,7 +31,9 @@ public class StakeHolderLeafService implements BaseService<StakeHolderLeaf, Stak
 
     @Override
     public StakeHolderLeaf save(StakeHolderLeaf leaf) {
-        return stakeHolderLeafRepository.save(leaf);
+        StakeHolderLeaf saved = stakeHolderLeafRepository.save(leaf);
+        stakeHolderLeafRepository.flush();
+        return saved;
     }
 
     @Override
@@ -88,7 +90,9 @@ public class StakeHolderLeafService implements BaseService<StakeHolderLeaf, Stak
     }
 
     public List<StakeHolderLeaf> saveAll(List<StakeHolderLeaf> leafs){
-        return this.stakeHolderLeafRepository.saveAll(leafs);
+        List<StakeHolderLeaf> saved = this.stakeHolderLeafRepository.saveAll(leafs);
+        stakeHolderLeafRepository.flush();
+        return saved;
     }
 
     public Map<StakeHolder, StakeHolderLeaf> getLeaves (Collection<StakeHolder> stakeHolders){

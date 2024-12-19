@@ -34,6 +34,7 @@ public class ErrorsHandlerAspect {
             return joinPoint.proceed();
         } catch(Throwable throwable){
             assert throwable instanceof RuntimeException;
+            System.out.println(throwable.getMessage());
             RuntimeException e = (RuntimeException) throwable;
             return e instanceof IllegalCallerException ? this.notSupportedMethodProblemDetail( (IllegalCallerException) e)
                     : this.notFoundProblemDetail(e);

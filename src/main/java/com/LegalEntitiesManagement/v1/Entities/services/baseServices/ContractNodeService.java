@@ -31,7 +31,9 @@ public class ContractNodeService implements BaseService<ContractNode, ContractNo
 
     @Override
     public ContractNode save(ContractNode node) {
-        return contractNodeRepository.save(node);
+        ContractNode saved = contractNodeRepository.save(node);
+        contractNodeRepository.flush();
+        return saved;
     }
 
     @Override
@@ -90,7 +92,9 @@ public class ContractNodeService implements BaseService<ContractNode, ContractNo
     }
 
     public List<ContractNode> saveBatch(Iterable<ContractNode> contractNodes){
-        return this.contractNodeRepository.saveAll(contractNodes);
+        List<ContractNode> saved = this.contractNodeRepository.saveAll(contractNodes);
+        contractNodeRepository.flush();
+        return saved;
     }
 
     public List<ContractNode> findByIds(Collection<Long> ids){

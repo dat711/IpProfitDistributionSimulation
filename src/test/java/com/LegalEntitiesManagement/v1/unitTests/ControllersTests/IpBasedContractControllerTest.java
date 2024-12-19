@@ -158,7 +158,7 @@ public class IpBasedContractControllerTest extends BaseControllerTestClass {
     void whenUpdateExistingIpBasedContract_thenSuccess() throws Exception {
         // Given
         Long contractId = 1L;
-        testContractComposition.getContractDto().setId(contractId);
+        testContractComposition.getContractDetail().setId(contractId);
         when(entitiesCrudService.updateIpBasedContract(any(IpBasedContractCompositionDto.class)))
                 .thenReturn(testContractComposition);
 
@@ -178,7 +178,7 @@ public class IpBasedContractControllerTest extends BaseControllerTestClass {
     void whenUpdateNonExistingIpBasedContract_thenNotFound() throws Exception {
         // Given
         Long contractId = 999L;
-        testContractComposition.getContractDto().setId(contractId);
+        testContractComposition.getContractDetail().setId(contractId);
         doThrow(new ContractNotFoundException(contractId))
                 .when(entitiesCrudService).updateIpBasedContract(any(IpBasedContractCompositionDto.class));
 

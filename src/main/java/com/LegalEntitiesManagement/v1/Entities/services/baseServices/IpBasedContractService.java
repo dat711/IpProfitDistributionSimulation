@@ -31,7 +31,9 @@ public class IpBasedContractService implements BaseService<IpBasedContract, IpBa
 
     @Override
     public IpBasedContract save(IpBasedContract contract) {
-        return ipBasedContractRepository.save(contract);
+        IpBasedContract saved = ipBasedContractRepository.save(contract);
+        ipBasedContractRepository.flush();
+        return saved;
     }
 
     @Override
@@ -96,7 +98,9 @@ public class IpBasedContractService implements BaseService<IpBasedContract, IpBa
     }
 
     public List<IpBasedContract> saveAll(List<IpBasedContract> ipBasedContracts){
-        return this.ipBasedContractRepository.saveAll(ipBasedContracts);
+        List<IpBasedContract> saved = this.ipBasedContractRepository.saveAll(ipBasedContracts);
+        ipBasedContractRepository.flush();
+        return saved;
     }
 
     public boolean contractsHavingSameIp(Set<IpBasedContract> contracts){

@@ -315,12 +315,27 @@ public class EntitiesCrudService {
         );
     }
 
+    private Set<ContractParticipant> injectedStakeHolderToNewParticipant(Set<ContractParticipant> preSaved){
+        List<StakeHolder> stakeHolders = this.stakeHolderService.findAndVerifyAll(preSaved.stream()
+                .map(contractParticipant -> contractParticipant.getStakeholder().getId()).toList());
+        Map<Long, StakeHolder> mapStakeHolderById = stakeHolders.stream().collect(Collectors.toMap(
+                StakeHolder::getId,
+                stakeHolder -> stakeHolder
+        ));
+
+        preSaved.forEach(participant -> {
+            participant.setStakeholder(mapStakeHolderById.get(participant.getStakeholder().getId()));
+        });
+
+        return preSaved;
+    }
+
     private IpBasedContract injectedParticipantPreSavedIpBasedContract(IpBasedContractDto ipBasedContractDto,
                                                                 Set<ParticipantDto> participantDtos){
         IpBasedContract ipBasedContract = ipBasedContractMapper.toEntity(ipBasedContractDto);
         Set<ContractParticipant> preSaved = participantMapper.toEntitySet(participantDtos);
         preSaved.forEach(contractParticipant -> contractParticipant.setContract(ipBasedContract));
-        ipBasedContract.setContractParticipants(preSaved);
+        ipBasedContract.setContractParticipants(injectedStakeHolderToNewParticipant(preSaved));
         return ipBasedContract;
     }
 
@@ -335,7 +350,7 @@ public class EntitiesCrudService {
 
         IpBasedContract ipBasedContract = injectedParticipantPreSavedIpBasedContract(ipBasedContractDto, participantDtos);
 
-        if(!this.graphBuilderService.ipTreeService.existsById(ipId)){
+        if(!this.graphBuilderService.existTreeWithIpId(ipId)){
             this.graphBuilderService.validateBuildNewTree(Collections.singletonList(ipBasedContract));
             SavedIpBasedContractDetails savedContractDetails = getSavedIpBasedContractDetails(ipBasedContractDto, participantDtos);
             IpBasedContract savedContract = savedContractDetails.savedContract;
@@ -375,7 +390,7 @@ public class EntitiesCrudService {
 
         ProcessBulkIpBasedContracts processBulkIpBasedContracts = getPreSavedIpBasedContractDetails(ipBasedContractCompositionDtoList);
 
-        if(!this.graphBuilderService.ipTreeService.existsById(ipId)){
+        if(!this.graphBuilderService.existTreeWithIpId(ipId)){
             this.graphBuilderService.validateBuildNewTree(processBulkIpBasedContracts.preSavedIpBasedContracts);
             List<IpBasedContract> newContracts = saveAllValidIpBasedContract(processBulkIpBasedContracts);
             this.graphBuilderService.buildNewTree(newContracts.stream().toList());

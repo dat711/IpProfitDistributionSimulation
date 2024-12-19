@@ -42,7 +42,9 @@ public class StakeHolderService implements BaseService<StakeHolder, StakeHolderD
 
     @Override
     public StakeHolder save(StakeHolder stakeHolder) {
-        return this.stakeHolderRepository.save(stakeHolder);
+        StakeHolder saved =  this.stakeHolderRepository.save(stakeHolder);
+        stakeHolderRepository.flush();
+        return saved;
     }
 
     @Override

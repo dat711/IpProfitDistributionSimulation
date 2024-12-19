@@ -31,7 +31,9 @@ public class BaseContractService implements BaseService<Contract, ContractDto, L
 
     @Override
     public Contract save(Contract contract) {
-        return contractRepository.save(contract);
+        Contract saved = contractRepository.save(contract);
+        contractRepository.flush();
+        return saved;
     }
 
     @Override

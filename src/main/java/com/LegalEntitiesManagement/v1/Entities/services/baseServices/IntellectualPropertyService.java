@@ -29,7 +29,9 @@ public class IntellectualPropertyService implements BaseService<IntellectualProp
 
     @Override
     public IntellectualProperty save(IntellectualProperty intellectualProperty) {
-        return this.intellectualPropertyRepository.save(intellectualProperty);
+        IntellectualProperty saved = this.intellectualPropertyRepository.save(intellectualProperty);
+        intellectualPropertyRepository.flush();
+        return saved;
     }
 
     @Override

@@ -35,7 +35,11 @@ public class RoleService implements BaseService<Role, RoleDto, Long>, Updatable<
     }
 
     @Override
-    public Role save(Role role) {return this.roleRepository.save(role);}
+    public Role save(Role role) {
+        Role saved = this.roleRepository.save(role);
+        roleRepository.flush();
+        return saved;
+    }
 
     @Override
     public boolean existsById(Long id) {

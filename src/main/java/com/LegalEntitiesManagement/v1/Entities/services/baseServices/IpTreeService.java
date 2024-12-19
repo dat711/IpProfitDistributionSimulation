@@ -28,7 +28,9 @@ public class IpTreeService implements BaseService<IpTree, IpTreeDto, Long>{
 
     @Override
     public IpTree save(IpTree ipTree) {
-        return ipTreeRepository.save(ipTree);
+        IpTree saved = ipTreeRepository.save(ipTree);
+        ipTreeRepository.flush();
+        return saved;
     }
 
     @Override

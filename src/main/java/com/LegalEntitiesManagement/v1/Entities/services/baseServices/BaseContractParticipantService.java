@@ -35,7 +35,9 @@ public class BaseContractParticipantService implements BaseService<ContractParti
 
     @Override
     public ContractParticipant save(ContractParticipant participant) {
-        return participantRepository.save(participant);
+        ContractParticipant saved = participantRepository.save(participant);
+        participantRepository.flush();
+        return saved;
     }
 
     @Override
@@ -94,7 +96,9 @@ public class BaseContractParticipantService implements BaseService<ContractParti
     }
 
     public List<ContractParticipant> saveAll(List<ContractParticipant> participants){
-        return participantRepository.saveAll(participants);
+        List<ContractParticipant> saved = participantRepository.saveAll(participants);
+        participantRepository.flush();
+        return saved;
     }
 
     public Set<ContractParticipant> getParticipantByContractIds(Set<Long> ids){
